@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- Local upload previews use object URLs. */
 "use client";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import type { Order, ReturnRequest, Product } from "@/lib/types";
 import { api, useStore } from "./store-context";
@@ -505,14 +506,12 @@ export function Orders() {
 export function Returns() {
   const { customer, busy, setBusy } = useStore();
   const { orders, returns, loading, error, refresh } = useHistory();
-  const [order, setOrder] = useState(() =>
-      typeof window === "undefined"
-        ? ""
-        : new URLSearchParams(window.location.search).get("order") || "",
-    ),
+  const searchParams = useSearchParams();
+  const [chosenOrder, setOrder] = useState<string | null>(null),
     [message, setMessage] = useState(""),
     [failure, setFailure] = useState(""),
     [preview, setPreview] = useState("");
+  const order = chosenOrder ?? searchParams.get("order") ?? "";
   const eligible = orders.filter(
     (o) =>
       o.fulfillment_status === "delivered" &&

@@ -1,6 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db";
+import { acceptsOrigin } from "@/lib/operations/request-origin";
 import { positiveId, StoreError, storeService } from "./service";
 export const store = storeService(db);
 export async function selectedCustomer() {
@@ -20,7 +21,6 @@ export function failure(error: unknown) {
   );
 }
 export function sameOrigin(request: Request) {
-  const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin)
+  if (!acceptsOrigin(request))
     throw new StoreError("Request origin is not allowed.", 403);
 }
