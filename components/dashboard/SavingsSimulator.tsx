@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { DEFAULT_COST_CONFIG } from '@/lib/logistics/config';
 import { kmToMiles, milesToKm, round } from '@/lib/logistics/geo';
 import { simulateSavings } from '@/lib/logistics/simulator';
-import { formatEmissions, formatEuro, formatMiles, formatNumber, formatPercent } from './format';
+import { formatEmissions, formatEuro, formatMiles, formatNumber, formatPercent, ui } from './format';
 
 const defaultInputs = {
   returns: 250,
@@ -45,19 +45,20 @@ export function SavingsSimulator() {
   const belowMinimum = result.savingsPerRerouteCents < minSavingsCents;
 
   return (
-    <section aria-labelledby="simulator-heading" className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-8">
-      <h2 id="simulator-heading" className="text-2xl font-semibold tracking-tight">Savings simulator</h2>
-      <p className="mt-1 text-sm text-slate-600">
+    <section aria-labelledby="simulator-heading" className={ui.card}>
+      <p className={ui.eyebrow}>Forecast</p>
+      <h2 id="simulator-heading" className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">Savings simulator</h2>
+      <p className="mt-2 max-w-xl text-sm text-[var(--muted)]">
         Adjust your return volume, route distances and delivery costs to estimate savings.
       </p>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr] lg:gap-8">
-        <div className="grid gap-4">
+      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_1fr] lg:gap-10">
+        <div className="grid gap-5">
           {sliders.map(({ key, label, min, max, step, format }) => (
             <div key={key}>
               <div className="flex items-baseline justify-between gap-3">
-                <label htmlFor={key} className="text-sm font-medium text-slate-700">{label}</label>
-                <output aria-hidden="true" htmlFor={key} className="whitespace-nowrap text-sm font-semibold tabular-nums text-slate-900">
+                <label htmlFor={key} className="text-sm font-medium text-[var(--ink)]">{label}</label>
+                <output aria-hidden="true" htmlFor={key} className="whitespace-nowrap text-sm font-semibold tabular-nums text-[var(--olive)]">
                   {format(inputs[key])}
                 </output>
               </div>
@@ -73,30 +74,30 @@ export function SavingsSimulator() {
                   const value = event.currentTarget.valueAsNumber;
                   setInputs((previous) => ({ ...previous, [key]: value }));
                 }}
-                className="mt-2 h-5 w-full cursor-pointer accent-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+                className="mt-2 h-5 w-full cursor-pointer accent-[var(--olive)]"
               />
             </div>
           ))}
         </div>
 
-        <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4 sm:p-6">
-          <h3 className="text-sm font-semibold text-emerald-950">Projected annual savings</h3>
-          <p aria-live="polite" className="mt-1 break-words text-3xl font-semibold tracking-tight tabular-nums text-emerald-900 sm:text-4xl">
+        <div className="self-start border border-[var(--good-line)] bg-[var(--good-bg)] p-5 sm:p-7">
+          <h3 className={ui.eyebrow}>Projected annual savings</h3>
+          <p aria-live="polite" className="mt-3 break-words text-4xl font-semibold tracking-[-0.05em] tabular-nums text-[var(--ink)] sm:text-5xl">
             {formatEuro(result.annualSavingsCents)}
           </p>
-          <p className="mt-2 text-sm text-emerald-900">
+          <p className="mt-2 text-sm text-[var(--muted)]">
             {formatNumber(result.reroutesPerMonth)} expected reroutes per month
           </p>
 
           <table className="mt-5 w-full text-left text-xs sm:text-sm">
             <thead>
-              <tr className="border-b border-emerald-200 text-emerald-900">
+              <tr className="border-b border-[var(--good-line)] text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
                 <th scope="col" className="sr-only">Metric</th>
                 <th scope="col" className="px-1 py-2 text-right font-medium">Monthly</th>
                 <th scope="col" className="py-2 text-right font-medium">Annual</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-emerald-100 tabular-nums text-emerald-950">
+            <tbody className="divide-y divide-[var(--good-line)] tabular-nums text-[var(--ink)]">
               <tr>
                 <th scope="row" className="py-2 pr-1 font-medium">Savings</th>
                 <td className="px-1 py-2 text-right">{formatEuro(result.monthlySavingsCents)}</td>
@@ -115,7 +116,7 @@ export function SavingsSimulator() {
             </tbody>
           </table>
 
-          <div className="mt-4 border-t border-emerald-200 pt-3 text-xs leading-relaxed text-emerald-900" role="status">
+          <div className="mt-4 border-t border-[var(--good-line)] pt-3 text-xs leading-relaxed text-[var(--muted)]" role="status">
             <p>Cost difference per potential reroute: {formatEuro(result.savingsPerRerouteCents)}.</p>
             {outsideRadius ? (
               <p>Local reroutes require a buyer within {formatNumber(kmToMiles(maxRadiusKm))} mi.</p>
@@ -125,7 +126,7 @@ export function SavingsSimulator() {
           </div>
         </div>
       </div>
-      <p className="mt-5 text-xs leading-relaxed text-slate-600">
+      <p className="mt-6 border-t border-[var(--line)] pt-4 text-xs leading-relaxed text-[var(--muted)]">
         Estimates use straight-line distances with a {DEFAULT_COST_CONFIG.roadFactor}× road factor and equal assumed warehouse legs.
       </p>
     </section>

@@ -39,17 +39,17 @@ export function ApproveButton({ returnId, buyerOrderId }: { returnId: number; bu
   }
 
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="flex flex-col items-end gap-1.5">
       <button
         type="button"
         onClick={approve}
         disabled={busy || pending || error?.conflict}
-        className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+        className="inline-flex min-h-12 items-center justify-center border border-[var(--accent)] bg-[var(--accent)] px-5 text-sm font-semibold text-[var(--on-accent)] transition-[filter,transform] hover:-translate-y-0.5 hover:brightness-110 active:translate-y-px disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 disabled:brightness-100"
       >
         {busy || (pending && !error?.conflict) ? 'Approving…' : 'Approve reroute'}
       </button>
       {error && (
-        <p role="alert" className="max-w-xs text-right text-xs text-red-600">
+        <p role="alert" className="max-w-xs border border-[var(--danger)] bg-[var(--danger-bg)] px-3 py-2 text-right text-xs text-[var(--danger)]">
           {error.message}
         </p>
       )}
@@ -58,7 +58,7 @@ export function ApproveButton({ returnId, buyerOrderId }: { returnId: number; bu
           type="button"
           onClick={() => startTransition(() => router.refresh())}
           disabled={pending}
-          className="text-sm font-medium text-sky-700 underline underline-offset-4 disabled:opacity-50"
+          className="text-sm font-medium text-[var(--ink)] underline underline-offset-4 hover:text-[var(--olive)] disabled:opacity-50"
         >
           {pending ? 'Refreshing…' : 'Refresh matches'}
         </button>

@@ -13,9 +13,9 @@ type RouteMapProps = {
 const toLatLng = ({ lat, lng }: GeoPoint): LatLngTuple => [lat, lng];
 
 const markerStyles = [
-  { key: 'returner', marker: 'R', role: 'Returner', color: '#0f172a', anchorX: 24 },
-  { key: 'buyer', marker: 'B', role: 'Buyer', color: '#047857', anchorX: 0 },
-  { key: 'warehouse', marker: 'W', role: 'Warehouse', color: '#475569', anchorX: 12 },
+  { key: 'returner', marker: 'R', role: 'Returner', color: '#202e28', anchorX: 24 },
+  { key: 'buyer', marker: 'B', role: 'Buyer', color: '#3e624a', anchorX: 0 },
+  { key: 'warehouse', marker: 'W', role: 'Warehouse', color: '#6b7368', anchorX: 12 },
 ] as const;
 
 const routeChoices = [
@@ -67,9 +67,9 @@ export default function RouteMap({ returner, buyer, warehouse }: RouteMapProps) 
 
       routeLines.current = {
         warehouse: leaflet.polyline([from, via, to], {
-          color: '#475569', weight: 4, dashArray: '7 8',
+          color: '#5f665c', weight: 4, dashArray: '7 8',
         }).addTo(map),
-        reroute: leaflet.polyline([from, to], { color: '#047857', weight: 5 }).addTo(map),
+        reroute: leaflet.polyline([from, to], { color: '#3e624a', weight: 5 }).addTo(map),
       };
 
       const stops = { returner, buyer, warehouse };
@@ -77,7 +77,7 @@ export default function RouteMap({ returner, buyer, warehouse }: RouteMapProps) 
         const point = stops[key];
         const label = `${role} · ${point.label}`;
         const badge = document.createElement('span');
-        badge.className = 'grid size-6 place-items-center rounded-full border-2 border-white text-[10px] font-bold text-white shadow-md';
+        badge.className = 'grid size-6 place-items-center border-2 border-[#fffdf8] text-[10px] font-bold text-[#fffdf8]';
         badge.style.backgroundColor = color;
         badge.textContent = marker;
 
@@ -132,10 +132,13 @@ export default function RouteMap({ returner, buyer, warehouse }: RouteMapProps) 
   }, [highlight, status]);
 
   return (
-    <section aria-labelledby="route-map-heading" className="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-      <div className="flex flex-wrap items-center justify-between gap-3 p-4 sm:px-5">
-        <h2 id="route-map-heading" className="text-lg font-semibold tracking-tight">Route map</h2>
-        <div role="group" aria-label="Highlight a route" className="flex flex-wrap gap-1 rounded-lg bg-slate-100 p-1">
+    <section aria-labelledby="route-map-heading" className="min-w-0 overflow-hidden border border-[var(--line)] bg-[var(--surface)]">
+      <div className="flex flex-wrap items-end justify-between gap-4 p-5 sm:px-6">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">Straight-line estimate</p>
+          <h2 id="route-map-heading" className="mt-1.5 text-2xl font-semibold tracking-[-0.04em]">Route map</h2>
+        </div>
+        <div role="group" aria-label="Highlight a route" className="flex flex-wrap border border-[var(--line)]">
           {routeChoices.map(({ value, label }) => (
             <button
               key={value}
@@ -143,7 +146,7 @@ export default function RouteMap({ returner, buyer, warehouse }: RouteMapProps) 
               aria-pressed={highlight === value}
               disabled={status !== 'ready'}
               onClick={() => setHighlight(value)}
-              className="rounded-md px-2 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-white/70 focus-visible:outline-2 focus-visible:outline-emerald-700 disabled:opacity-50 aria-pressed:bg-white aria-pressed:text-emerald-900 aria-pressed:shadow-sm sm:px-3"
+              className="min-h-10 border-r border-[var(--line)] px-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] transition-colors last:border-r-0 hover:bg-[var(--soft)] hover:text-[var(--ink)] disabled:opacity-50 aria-pressed:bg-[var(--accent)] aria-pressed:text-[var(--on-accent)] sm:px-3.5"
             >
               {label}
             </button>
@@ -151,40 +154,40 @@ export default function RouteMap({ returner, buyer, warehouse }: RouteMapProps) 
         </div>
       </div>
 
-      <div className="relative isolate border-y border-slate-200">
+      <div className="relative isolate border-y border-[var(--line)]">
         <div
           ref={mapElement}
           className="h-[24rem] min-h-0 w-full sm:h-[30rem]"
           style={{
-            backgroundColor: '#f1f5f9',
-            backgroundImage: 'linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px)',
+            backgroundColor: 'var(--soft)',
+            backgroundImage: 'linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px)',
             backgroundSize: '24px 24px',
           }}
           role="region"
           aria-label="Map of the returner, buyer and warehouse routes"
         />
         {status !== 'ready' && (
-          <p role="status" className="pointer-events-none absolute inset-0 grid place-items-center px-6 text-center text-sm font-medium text-slate-700">
+          <p role="status" className="pointer-events-none absolute inset-0 grid place-items-center px-6 text-center text-sm font-medium text-[var(--muted)]">
             {status === 'loading' ? 'Loading route map…' : 'Map unavailable. The route comparison is still available.'}
           </p>
         )}
       </div>
 
       {status === 'ready' && tilesUnavailable && (
-        <p role="status" className="border-b border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 sm:px-5">
+        <p role="status" className="border-b border-[var(--line)] bg-[var(--warn-bg)] px-5 py-3 text-sm text-[var(--warn)] sm:px-6">
           Base map tiles could not fully load. Routes and stops are still shown.
         </p>
       )}
 
-      <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3 px-4 py-3 text-xs font-medium text-slate-700 sm:px-5">
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5 py-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] sm:px-6">
         <ul aria-label="Route legend" className="flex flex-wrap gap-x-4 gap-y-2">
-          <li className="flex items-center gap-2"><span aria-hidden="true" className="w-5 border-t-2 border-dashed border-slate-600" /> Via warehouse</li>
-          <li className="flex items-center gap-2"><span aria-hidden="true" className="w-5 border-t-2 border-emerald-700" /> RIP direct</li>
+          <li className="flex items-center gap-2"><span aria-hidden="true" className="w-6 border-t-2 border-dashed border-[var(--muted)]" /> Via warehouse</li>
+          <li className="flex items-center gap-2"><span aria-hidden="true" className="w-6 border-t-[3px] border-[var(--olive)]" /> RIP direct</li>
         </ul>
         <ul aria-label="Stop legend" className="flex flex-wrap items-center gap-3">
           {markerStyles.map(({ key, marker, role, color }) => (
             <li key={key} className="flex items-center gap-1.5">
-              <span aria-hidden="true" style={{ backgroundColor: color }} className="grid size-5 place-items-center rounded-full text-[10px] font-bold text-white">{marker}</span>
+              <span aria-hidden="true" style={{ backgroundColor: color }} className="grid size-5 place-items-center border border-[var(--line)] text-[10px] font-bold text-[#fffdf8]">{marker}</span>
               {role}
             </li>
           ))}

@@ -24,32 +24,3 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
-
-/* Shared seller palette for the existing dashboard, matching and analytics layouts. */
-.rip-seller {
-  color-scheme: dark;
-  background: #0c1011;
-  color: #e8f0ed;
-  font-family: var(--font-geist-sans), sans-serif;
-  --color-slate-50: #101617;
-  --color-neutral-50: #101617;
-  --color-slate-100: #212b2b;
-  --color-neutral-100: #212b2b;
-  --color-slate-200: #354241;
-  --color-neutral-200: #354241;
-  --color-slate-300: #485856;
-  --color-emerald-50: #102a23;
-  --color-emerald-100: #174435;
-  --color-sky-50: #14272c;
-  --color-sky-100: #19363e;
-  --color-amber-50: #2d2518;
-  --color-amber-100: #493923;
-}
-.rip-seller .bg-white { background-color: #171e20; }
-.rip-seller :is(.text-slate-950,.text-slate-900,.text-slate-800,.text-neutral-900,.text-neutral-800) { color: #edf4f1; }
-.rip-seller :is(.text-slate-700,.text-slate-600,.text-neutral-700,.text-neutral-600,.text-neutral-500,.text-slate-300,.text-slate-200) { color: #bac9c4; }
-.rip-seller :is(.text-emerald-700,.text-emerald-800,.text-emerald-900,.text-emerald-950,.text-sky-700,.text-sky-800,.text-sky-900) { color: #88e7be; }
-.rip-seller :is(.text-amber-800,.text-amber-900) { color: #f5d495; }
-.rip-seller .text-red-600 { color: #ffaaa3; }
-.rip-seller .leaflet-popup-content { color: #172625; }
-.rip-seller select { max-width: 100%; }

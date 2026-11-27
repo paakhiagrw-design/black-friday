@@ -219,6 +219,9 @@ export function IntroPage() {
         <Link href="/returns" className="rip-secondary-link">
           Already have something to return?
         </Link>
+        <Link href="/dashboard" prefetch={false} className="rip-secondary-link">
+          Selling with RIP? Open the seller dashboard →
+        </Link>
       </section>
     </div>
   );

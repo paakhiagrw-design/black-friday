@@ -128,11 +128,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             ["/store", "Shop"],
             ["/orders", "Your orders"],
             ["/returns", "Returns"],
+            ["/dashboard", "Seller dashboard"],
             ["/cart", `Bag (${cart.reduce((n, l) => n + l.quantity, 0)})`],
           ].map(([url, label]) => (
             <Link
               key={url}
               href={url}
+              prefetch={url === "/dashboard" ? false : undefined}
               aria-current={pathname === url ? "page" : undefined}
             >
               {label}
@@ -193,7 +195,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           RIP<span>Return In Proximity</span>
         </Link>
         <p>The end of unnecessary returns.</p>
-        <Link href="/dashboard" prefetch={false}>Seller dashboard</Link>
         <span>Dublin, Ireland · Demo store</span>
         <a href="/PHOTO-CREDITS.txt">Photo credits</a>
       </footer>
