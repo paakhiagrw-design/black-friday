@@ -7,18 +7,38 @@ test(
   "HTTP demo: photo return, ownership, duplicates, checkout and history",
   { skip: !base },
   async () => {
-    const request = async (url, options = {}) => fetch(base + url, options);
-    const select = async (id) => {
+    const localOrigin = new URL(base).origin;
+    const publicOrigin = process.env.STORE_TEST_PUBLIC_ORIGIN ?? localOrigin;
+    const request = (url, options = {}) =>
+      fetch(base + url, {
+        ...options,
+        headers: {
+          ...(options.method === "POST" ? { Origin: publicOrigin } : {}),
+          ...options.headers,
+        },
+      });
+    const select = async (id, origin) => {
       const response = await request("/api/products", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Origin: origin },
         body: JSON.stringify({ customer_id: id }),
       });
       assert.equal(response.status, 200);
-      return response.headers.get("set-cookie").split(";")[0];
+      const cookie = response.headers.get("set-cookie").split(";")[0];
+      const catalogue = await request("/api/products", { headers: { cookie } });
+      assert.equal((await catalogue.json()).customer_id, id);
+      return cookie;
     };
-    const a = await select(1),
-      b = await select(2);
+    for (const route of ["/api/products", "/api/checkout", "/api/returns"]) {
+      const response = await request(route, {
+        method: "POST",
+        headers: { Origin: "https://unrelated.example.test" },
+      });
+      assert.equal(response.status, 403, route);
+      assert.equal(response.headers.get("set-cookie"), null);
+    }
+    const a = await select(1, localOrigin),
+      b = await select(2, publicOrigin);
     const history = await (
       await request("/api/orders", { headers: { cookie: a } })
     ).json();

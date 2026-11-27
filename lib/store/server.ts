@@ -1,7 +1,7 @@
 import "server-only";
-import { acceptsOrigin } from "@/lib/operations/request-origin";
 import { cookies } from "next/headers";
 import { db } from "@/lib/db";
+import { acceptsOrigin } from "@/lib/operations/request-origin";
 import { positiveId, StoreError, storeService } from "./service";
 export const store = storeService(db);
 export async function selectedCustomer() {

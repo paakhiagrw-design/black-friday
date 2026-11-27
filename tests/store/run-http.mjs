@@ -35,7 +35,8 @@ try {
     source.close();
   }
   const port = process.env.STORE_TEST_PORT || "3107";
-  const url = `http://localhost:${port}`;
+  const url = `http://127.0.0.1:${port}`;
+  const publicDomain = "rip-store.example.test";
   server = spawn(
     process.execPath,
     [
@@ -45,7 +46,12 @@ try {
       "--port",
       port,
     ],
-    { cwd: directory, env: { ...process.env, DATABASE_PATH: path.join(directory, "database/reroute.db") }, stdio: ["ignore", "pipe", "pipe"] },
+    {
+      cwd: directory,
+      stdio: ["ignore", "pipe", "pipe"],
+      env: { ...process.env, RAILWAY_PUBLIC_DOMAIN: publicDomain, DATABASE_PATH: path.join(directory, "database/reroute.db") },
+    },
+
   );
   server.stdout.on("data", (chunk) => {
     logs += chunk;
@@ -71,7 +77,11 @@ try {
     ["--test", "tests/store/http.test.mjs"],
     {
       cwd: root,
-      env: { ...process.env, STORE_TEST_URL: url },
+      env: {
+        ...process.env,
+        STORE_TEST_URL: url,
+        STORE_TEST_PUBLIC_ORIGIN: `https://${publicDomain}`,
+      },
       stdio: "inherit",
     },
   );
