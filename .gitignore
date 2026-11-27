@@ -20,6 +20,11 @@
 # production
 /build
 
+# SQLite database and transient journal files
+/database/*.db
+/database/*.db-wal
+/database/*.db-shm
+
 # misc
 .DS_Store
 *.pem
