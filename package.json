@@ -10,14 +10,17 @@
     "db:init": "node database/init.mjs",
     "db:seed": "node database/seed.mjs",
     "db:reset": "node database/init.mjs && node database/reset.mjs && node database/seed.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:store": "node --experimental-strip-types --test tests/store/*.test.mjs",
+    "test:store:http": "node tests/store/run-http.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.2.0",
     "leaflet": "^1.9.4",
     "next": "16.4.6",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
