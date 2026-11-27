@@ -288,7 +288,7 @@ export function approveReroute(
   }
 }
 
-/** Cancel an accepted (not yet dispatched) reroute and release the reservation. */
+/** Cancel an accepted reroute before collection is arranged and release the reservation. */
 export function cancelReroute(database: DB, matchId: number): RerouteResult {
   const run = database.transaction((): RerouteResult => {
     const match = database.prepare('SELECT * FROM matches WHERE id = ?').get(matchId) as
@@ -298,6 +298,25 @@ export function cancelReroute(database: DB, matchId: number): RerouteResult {
     if (match.match_status !== 'accepted') {
       return fail('already_dispatched', `Match ${matchId} is '${match.match_status}' and cannot be cancelled`);
     }
+
+    const delivery = database.prepare<[number], { id: number; delivery_status: string }>(
+      'SELECT id, delivery_status FROM deliveries WHERE match_id = ?',
+    ).get(matchId);
+    if (delivery) {
+      if (delivery.delivery_status !== 'pending') {
+        return fail('already_dispatched', `Collection has already started for match ${matchId}`);
+      }
+
+      const collectionsTable = database.prepare(
+        "SELECT 1 FROM main.sqlite_master WHERE type = 'table' AND name = 'operation_collections'",
+      ).get();
+      if (collectionsTable && database.prepare(
+        'SELECT 1 FROM main.operation_collections WHERE delivery_id = ?',
+      ).get(delivery.id)) {
+        return fail('already_dispatched', `Collection has already been arranged for match ${matchId}`);
+      }
+    }
+
     database.prepare(`UPDATE matches SET match_status = 'cancelled' WHERE id = ?`).run(matchId);
     database
       .prepare(`UPDATE returns SET return_status = 'approved' WHERE id = ? AND return_status = 'matched'`)

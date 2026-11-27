@@ -198,6 +198,48 @@ describe('repository: approve / cancel', () => {
     expect(result(1).state).toBe('matchable');
   });
 
+  it.each([
+    { status: 'pending', collectionTable: false, scheduled: false, cancellable: true },
+    { status: 'pending', collectionTable: true, scheduled: false, cancellable: true },
+    { status: 'pending', collectionTable: true, scheduled: true, cancellable: false },
+    { status: 'collected', collectionTable: false, scheduled: false, cancellable: false },
+  ])('cancel with a $status delivery (collection table: $collectionTable, scheduled: $scheduled)', ({ status, collectionTable, scheduled, cancellable }) => {
+    customer(2, NEAR);
+    order(2, 2);
+    ret(1, 1);
+    const res = approveReroute(db, 1, 2);
+    if (!res.ok) throw new Error('expected ok');
+    const delivery = db.prepare(`
+      INSERT INTO deliveries (match_id, tracking_code, delivery_status)
+      VALUES (?, 'RR-DEMO-0001', ?) RETURNING id
+    `).get(res.match.id, status) as { id: number };
+    if (collectionTable) {
+      db.exec(`
+        CREATE TABLE operation_collections (
+          delivery_id INTEGER PRIMARY KEY REFERENCES deliveries(id),
+          method TEXT NOT NULL
+        );
+      `);
+    }
+    if (scheduled) {
+      db.prepare(`INSERT INTO operation_collections (delivery_id, method) VALUES (?, 'courier')`)
+        .run(delivery.id);
+    }
+
+    const cancellation = cancelReroute(db, res.match.id);
+    expect(cancellation).toMatchObject(cancellable
+      ? { ok: true, match: { status: 'cancelled' } }
+      : { ok: false, code: 'already_dispatched' });
+    expect(db.prepare('SELECT match_status FROM matches WHERE id = ?').get(res.match.id))
+      .toEqual({ match_status: cancellable ? 'cancelled' : 'accepted' });
+    expect(db.prepare('SELECT return_status FROM returns WHERE id = 1').get())
+      .toEqual({ return_status: cancellable ? 'approved' : 'matched' });
+    expect(db.prepare('SELECT fulfillment_status FROM orders WHERE id = 2').get())
+      .toEqual({ fulfillment_status: cancellable ? 'unfulfilled' : 'processing' });
+    expect(db.prepare('SELECT delivery_status FROM deliveries WHERE id = ?').get(delivery.id))
+      .toEqual({ delivery_status: status });
+  });
+
   it('returns not_found for missing return or order', () => {
     expect(approveReroute(db, 99, 1)).toMatchObject({ ok: false, code: 'not_found' });
     customer(2, NEAR);
