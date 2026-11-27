@@ -9,7 +9,7 @@ export const KM_PER_MILE = 1.609344;
  * The warehouse is a fictional central fulfilment centre in Kildare, about 50 km from Dublin.
  */
 export const DEFAULT_COST_CONFIG: CostConfig = {
-  warehouse: { lat: 53.1589, lng: -6.9096, label: 'ReRoute Central Fulfilment (Kildare)' },
+  warehouse: { lat: 53.1589, lng: -6.9096, label: 'RIP Central Fulfilment (Kildare)' },
   maxRadiusKm: MAX_RADIUS_KM,
   roadFactor: 1.3,
   parcelBaseCents: 495,

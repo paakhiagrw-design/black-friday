@@ -7,7 +7,7 @@ import { SavingsSimulator } from '@/components/dashboard/SavingsSimulator';
 import { getAnalytics } from '@/lib/dashboard/queries';
 import { db } from '@/lib/db';
 
-export const metadata: Metadata = { title: 'Savings Analytics | ReRoute' };
+export const metadata: Metadata = { title: 'Savings Analytics | RIP — Return In Proximity' };
 
 async function CompletedRerouteReport() {
   await connection();

@@ -94,9 +94,16 @@ export function MatchCard({ result }: { result: ReturnMatchResult }) {
             Rerouted to order #{reservedMatch.buyerOrderId} ({reservedMatch.status.replace('_', ' ')}) · saves{' '}
             <strong>{formatCents(reservedMatch.savingsCents)}</strong>
           </span>
-          <Link href={routeHref(result.returnId, reservedMatch.buyerOrderId)} className="text-sky-700 hover:underline">
-            View route
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href={routeHref(result.returnId, reservedMatch.buyerOrderId)} className="text-sky-700 hover:underline">
+              View route
+            </Link>
+            {reservedMatch.status === 'accepted' && (
+              <Link href="/delivery" className="rounded-md bg-sky-800 px-3 py-1.5 font-semibold text-white hover:bg-sky-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800">
+                Arrange collection
+              </Link>
+            )}
+          </div>
         </div>
       )}
 

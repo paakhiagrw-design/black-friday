@@ -21,7 +21,7 @@ const markerStyles = [
 const routeChoices = [
   { value: 'both', label: 'Both routes' },
   { value: 'warehouse', label: 'Via warehouse' },
-  { value: 'reroute', label: 'ReRoute direct' },
+  { value: 'reroute', label: 'RIP direct' },
 ] as const;
 
 export default function RouteMap({ returner, buyer, warehouse }: RouteMapProps) {
@@ -45,7 +45,8 @@ export default function RouteMap({ returner, buyer, warehouse }: RouteMapProps) 
       const from = toLatLng(returner);
       const to = toLatLng(buyer);
       const via = toLatLng(warehouse);
-      map = leaflet.map(container, { scrollWheelZoom: false });
+      const routeMap = leaflet.map(container, { scrollWheelZoom: false, zoomSnap: 0.25 });
+      map = routeMap;
 
       let hadTileError = false;
       const tiles = leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -97,7 +98,10 @@ export default function RouteMap({ returner, buyer, warehouse }: RouteMapProps) 
         mapMarker.getElement()?.setAttribute('aria-label', label);
       }
 
-      map.fitBounds(leaflet.latLngBounds([from, to, via]), { padding: [48, 48], maxZoom: 15 });
+      const bounds = leaflet.latLngBounds([from, to, via]);
+      const fitRoute = () => routeMap.fitBounds(bounds, { padding: [28, 28], maxZoom: 15 });
+      fitRoute();
+      routeMap.on('resize', fitRoute);
       setStatus('ready');
     }).catch(() => {
       if (!mounted) return;
@@ -175,7 +179,7 @@ export default function RouteMap({ returner, buyer, warehouse }: RouteMapProps) 
       <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3 px-4 py-3 text-xs font-medium text-slate-700 sm:px-5">
         <ul aria-label="Route legend" className="flex flex-wrap gap-x-4 gap-y-2">
           <li className="flex items-center gap-2"><span aria-hidden="true" className="w-5 border-t-2 border-dashed border-slate-600" /> Via warehouse</li>
-          <li className="flex items-center gap-2"><span aria-hidden="true" className="w-5 border-t-2 border-emerald-700" /> ReRoute direct</li>
+          <li className="flex items-center gap-2"><span aria-hidden="true" className="w-5 border-t-2 border-emerald-700" /> RIP direct</li>
         </ul>
         <ul aria-label="Stop legend" className="flex flex-wrap items-center gap-3">
           {markerStyles.map(({ key, marker, role, color }) => (

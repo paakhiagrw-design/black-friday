@@ -12,7 +12,7 @@ import { getRouteOptions, getRouteView } from '@/lib/logistics/routeView';
 import type { CostBreakdown, RouteEstimate } from '@/lib/logistics/types';
 
 export const metadata: Metadata = {
-  title: 'Route comparison | ReRoute',
+  title: 'Route comparison | RIP — Return In Proximity',
 };
 
 const number = new Intl.NumberFormat('en-IE', { maximumFractionDigits: 1 });
@@ -56,7 +56,7 @@ function RouteComparison({ costs, route }: { costs: CostBreakdown; route: RouteE
             <td className="py-3 text-right tabular-nums">{euros(costs.traditionalCents)}</td>
           </tr>
           <tr>
-            <th scope="row" className="py-3 font-medium text-emerald-800">ReRoute direct</th>
+            <th scope="row" className="py-3 font-medium text-emerald-800">RIP direct</th>
             <td className="py-3 text-right tabular-nums">{miles(route.directKm)}</td>
             <td className="py-3 text-right tabular-nums">{euros(costs.rerouteCents)}</td>
           </tr>

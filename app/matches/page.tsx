@@ -5,7 +5,7 @@ import { MatchCard } from '@/components/logistics/MatchCard';
 import { db } from '@/lib/db';
 import { getMatchResults } from '@/lib/logistics/repository';
 
-export const metadata = { title: 'Smart matches · ReRoute' };
+export const metadata = { title: 'Smart matches | RIP — Return In Proximity' };
 
 async function MatchList() {
   await connection();
