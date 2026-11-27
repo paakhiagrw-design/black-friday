@@ -33,48 +33,49 @@ function RouteComparison({ costs, route }: { costs: CostBreakdown; route: RouteE
   const savesMoney = costs.savingsCents >= 0;
 
   return (
-    <section aria-labelledby="comparison-heading" className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-      <h2 id="comparison-heading" className="text-lg font-semibold tracking-tight">Route comparison</h2>
+    <section aria-labelledby="comparison-heading" className="border border-[var(--line)] bg-[var(--surface)] p-5 sm:p-7">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">Cost &amp; carbon</p>
+      <h2 id="comparison-heading" className="mt-1.5 text-2xl font-semibold tracking-[-0.04em]">Route comparison</h2>
 
-      <div className={`mt-4 rounded-xl p-4 ${savesMoney ? 'bg-emerald-50 text-emerald-900' : 'bg-slate-100 text-slate-900'}`}>
-        <p className="text-sm font-medium">{savesMoney ? 'Estimated savings' : 'Estimated extra cost'}</p>
-        <p className="mt-1 text-4xl font-semibold tracking-tight">{euros(Math.abs(costs.savingsCents))}</p>
+      <div className={`mt-5 border p-5 ${savesMoney ? 'border-[var(--good-line)] bg-[var(--good-bg)]' : 'border-[var(--line)] bg-[var(--soft)]'}`}>
+        <p className={`text-[11px] font-semibold uppercase tracking-[0.1em] ${savesMoney ? 'text-[var(--olive)]' : 'text-[var(--muted)]'}`}>{savesMoney ? 'Estimated savings' : 'Estimated extra cost'}</p>
+        <p className="mt-2 text-5xl font-semibold leading-none tracking-[-0.05em] tabular-nums">{euros(Math.abs(costs.savingsCents))}</p>
       </div>
 
-      <table className="mt-4 w-full text-left text-sm">
-        <thead className="text-slate-600">
+      <table className="mt-5 w-full text-left text-sm">
+        <thead className="text-[11px] uppercase tracking-[0.1em] text-[var(--muted)]">
           <tr>
-            <th scope="col" className="py-2 font-medium">Route</th>
-            <th scope="col" className="py-2 text-right font-medium">Distance</th>
-            <th scope="col" className="py-2 text-right font-medium">Cost</th>
+            <th scope="col" className="py-2 font-semibold">Route</th>
+            <th scope="col" className="py-2 text-right font-semibold">Distance</th>
+            <th scope="col" className="py-2 text-right font-semibold">Cost</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-200 border-t border-slate-200">
+        <tbody className="divide-y divide-[var(--line)] border-y border-[var(--line)]">
           <tr>
-            <th scope="row" className="py-3 font-medium text-slate-700">Via warehouse</th>
+            <th scope="row" className="py-3 font-medium text-[var(--muted)]">Via warehouse</th>
             <td className="py-3 text-right tabular-nums">{miles(route.viaWarehouseKm)}</td>
             <td className="py-3 text-right tabular-nums">{euros(costs.traditionalCents)}</td>
           </tr>
           <tr>
-            <th scope="row" className="py-3 font-medium text-emerald-800">RIP direct</th>
+            <th scope="row" className="py-3 font-semibold text-[var(--olive)]">RIP direct</th>
             <td className="py-3 text-right tabular-nums">{miles(route.directKm)}</td>
             <td className="py-3 text-right tabular-nums">{euros(costs.rerouteCents)}</td>
           </tr>
         </tbody>
       </table>
 
-      <dl className="mt-4 grid grid-cols-2 gap-4 border-t border-slate-200 pt-4">
+      <dl className="mt-5 grid grid-cols-2 gap-4">
         <div>
-          <dt className="text-sm text-slate-600">Distance saved</dt>
-          <dd className="mt-1 text-lg font-semibold tabular-nums">{miles(route.distanceSavedKm)}</dd>
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">Distance saved</dt>
+          <dd className="mt-1.5 text-2xl font-semibold tracking-[-0.03em] tabular-nums">{miles(route.distanceSavedKm)}</dd>
         </div>
         <div>
-          <dt className="text-sm text-slate-600">CO₂e saved (est.)</dt>
-          <dd className="mt-1 text-lg font-semibold tabular-nums">{number.format(route.co2SavedKg)} kg</dd>
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">CO₂e saved (est.)</dt>
+          <dd className="mt-1.5 text-2xl font-semibold tracking-[-0.03em] tabular-nums">{number.format(route.co2SavedKg)} kg</dd>
         </div>
       </dl>
 
-      <p className="mt-5 text-xs leading-relaxed text-slate-600">
+      <p className="mt-6 border-t border-[var(--line)] pt-4 text-xs leading-relaxed text-[var(--muted)]">
         Straight-line distances with a 1.3× road factor: estimates, not actual road routing.
       </p>
     </section>
@@ -83,9 +84,10 @@ function RouteComparison({ costs, route }: { costs: CostBreakdown; route: RouteE
 
 function RouteUnavailable({ children }: { children: ReactNode }) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-      <h2 className="text-lg font-semibold">Route unavailable</h2>
-      <div className="mt-2 space-y-1 text-sm text-slate-600">{children}</div>
+    <section className="border border-[var(--line)] bg-[var(--surface)] p-6 sm:p-8">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">Nothing to compare</p>
+      <h2 className="mt-1.5 text-2xl font-semibold tracking-[-0.04em]">Route unavailable</h2>
+      <div className="mt-3 space-y-1 text-sm text-[var(--danger)]">{children}</div>
     </section>
   );
 }
@@ -103,15 +105,15 @@ function RoutePicker({
   ];
 
   return (
-    <Form action="/logistics" aria-label="Select routes to compare" className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-5 sm:grid-cols-[1fr_1fr_auto] sm:items-end sm:p-6">
+    <Form action="/logistics" aria-label="Select routes to compare" className="grid gap-4 border border-[var(--line)] bg-[var(--surface)] p-5 sm:grid-cols-[1fr_1fr_auto] sm:items-end sm:p-6">
       {fields.map(({ name, label, choices, selected }) => (
-        <label key={name} className="min-w-0 text-sm font-medium text-slate-700">
+        <label key={name} className="min-w-0 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">
           {label}
           <select
             name={name}
             defaultValue={choices.some(({ id }) => id === selected) ? String(selected) : ''}
             required
-            className="mt-1.5 block h-10 w-full rounded-lg border border-slate-300 bg-white px-2 text-sm text-slate-950 focus-visible:outline-2 focus-visible:outline-emerald-700"
+            className="mt-2 block min-h-12 w-full border border-[var(--line)] bg-[var(--paper)] px-3 text-sm font-normal normal-case tracking-normal text-[var(--ink)]"
           >
             <option value="" disabled>Select {label.toLowerCase()}</option>
             {choices.map(({ id, customerName, sku }) => (
@@ -120,7 +122,7 @@ function RoutePicker({
           </select>
         </label>
       ))}
-      <button type="submit" className="h-10 rounded-lg bg-emerald-800 px-4 text-sm font-semibold text-white transition-colors hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800">
+      <button type="submit" className="min-h-12 border border-[var(--accent)] bg-[var(--accent)] px-6 text-sm font-semibold text-[var(--on-accent)] transition-[filter,transform] hover:-translate-y-0.5 hover:brightness-110 active:translate-y-px">
         Compare routes
       </button>
     </Form>
@@ -150,22 +152,22 @@ function RouteDetails({ returnId, buyerOrderId }: SelectedPair) {
 
   return (
     <>
-      <dl className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 sm:grid-cols-3 sm:p-6">
-        <div>
-          <dt className="text-sm text-slate-600">Product · {view.product.sku}</dt>
-          <dd className="mt-1 font-semibold">{view.product.name}</dd>
+      <dl className="grid border border-[var(--line)] bg-[var(--surface)] sm:grid-cols-3">
+        <div className="border-b border-[var(--line)] p-5 sm:border-b-0 sm:border-r sm:p-6">
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">Product · {view.product.sku}</dt>
+          <dd className="mt-2 text-lg font-semibold tracking-[-0.02em]">{view.product.name}</dd>
         </div>
-        <div>
-          <dt className="text-sm text-slate-600">Return #{returnId}</dt>
-          <dd className="mt-1 font-semibold">{view.returner.label}</dd>
+        <div className="border-b border-[var(--line)] p-5 sm:border-b-0 sm:border-r sm:p-6">
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">Return #{returnId}</dt>
+          <dd className="mt-2 text-lg font-semibold tracking-[-0.02em]">{view.returner.label}</dd>
         </div>
-        <div>
-          <dt className="text-sm text-slate-600">Buyer order #{buyerOrderId}</dt>
-          <dd className="mt-1 font-semibold">{view.buyer.label}</dd>
+        <div className="p-5 sm:p-6">
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">Buyer order #{buyerOrderId}</dt>
+          <dd className="mt-2 text-lg font-semibold tracking-[-0.02em]">{view.buyer.label}</dd>
         </div>
       </dl>
 
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.7fr)_minmax(20rem,1fr)]">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(20rem,1fr)]">
         <RouteMap key={`${returnId}:${buyerOrderId}`} returner={view.returner} buyer={view.buyer} warehouse={view.warehouse} />
         <RouteComparison costs={view.costs} route={view.route} />
       </div>
@@ -199,19 +201,23 @@ async function RouteContent({ searchParams }: Pick<PageProps<'/logistics'>, 'sea
 
 export default function LogisticsPage({ searchParams }: PageProps<'/logistics'>) {
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-950">
-      <div className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-8 sm:py-9">
-        <header className="space-y-4">
-          <Link href="/matches" className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-800 hover:underline">
+    <main className="px-[4%] pb-20 pt-10 text-[var(--ink)] sm:pt-14">
+      <div className="mx-auto max-w-[1240px] space-y-6">
+        <header className="mb-4 flex flex-wrap items-end justify-between gap-6 border-b border-[var(--line)] pb-8">
+          <div className="max-w-2xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--muted)]">Seller · Logistics</p>
+            <h1 className="mt-3 text-4xl font-semibold leading-[1.02] tracking-[-0.04em] sm:text-5xl">Compare delivery routes</h1>
+            <p className="mt-4 text-sm leading-relaxed text-[var(--muted)] sm:text-base">See what changes when a return goes straight to the buyer.</p>
+          </div>
+          <Link
+            href="/matches"
+            className="inline-flex min-h-11 items-center gap-2 border-b border-[var(--ink)] text-sm font-medium text-[var(--ink)] transition-colors hover:border-[var(--olive)] hover:text-[var(--olive)]"
+          >
             <span aria-hidden="true">←</span> Matches
           </Link>
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Compare delivery routes</h1>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600 sm:text-base">See what changes when a return goes straight to the buyer.</p>
-          </div>
         </header>
 
-        <Suspense fallback={<p role="status" className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">Loading route comparison…</p>}>
+        <Suspense fallback={<p role="status" className="border border-[var(--line)] bg-[var(--surface)] p-6 text-sm text-[var(--muted)]">Loading route comparison…</p>}>
           <RouteContent searchParams={searchParams} />
         </Suspense>
       </div>

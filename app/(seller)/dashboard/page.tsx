@@ -10,6 +10,7 @@ import {
   formatInteger,
   formatMiles,
   formatPercent,
+  ui,
 } from '@/components/dashboard/format';
 import { getDashboardStats } from '@/lib/dashboard/queries';
 import { db } from '@/lib/db';
@@ -34,30 +35,30 @@ async function DashboardContent() {
   ];
 
   return (
-    <div className="grid gap-5">
-      <section aria-label="Savings and environmental impact" className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+    <div className="grid gap-6">
+      <section aria-label="Savings and environmental impact" className="grid grid-cols-2 border-t border-l border-[var(--line)] lg:grid-cols-4">
         {metrics.map(({ label, value, detail }) => (
-          <article key={label} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
-            <h2 className="text-sm font-medium text-slate-700">{label}</h2>
-            <p className="mt-2 text-xl font-semibold tracking-tight text-emerald-800 tabular-nums sm:text-3xl">{value}</p>
-            <p className="mt-2 text-xs text-slate-600">{detail}</p>
+          <article key={label} className="border-r border-b border-[var(--line)] bg-[var(--surface)] p-5 sm:p-7">
+            <h2 className={ui.eyebrow}>{label}</h2>
+            <p className="mt-4 text-2xl font-semibold tracking-[-0.04em] text-[var(--ink)] tabular-nums sm:text-4xl">{value}</p>
+            <p className="mt-3 text-xs text-[var(--muted)]">{detail}</p>
           </article>
         ))}
       </section>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_2fr]">
-        <section aria-labelledby="reroute-rate-heading" className="rounded-2xl bg-slate-900 p-6 text-white sm:p-8">
-          <h2 id="reroute-rate-heading" className="text-sm font-medium text-slate-200">Reroute rate</h2>
-          <p className="mt-2 text-5xl font-semibold tracking-tight tabular-nums">{formatPercent(stats.rerouteRate)}</p>
-          <p className="mt-3 text-sm text-slate-300">Share of verified returns approved for local delivery.</p>
-          <dl className="mt-5 grid grid-cols-2 gap-3 border-t border-slate-700 pt-5">
+      <div className="grid gap-6 lg:grid-cols-[1fr_2fr]">
+        <section aria-labelledby="reroute-rate-heading" className="flex flex-col bg-[var(--accent)] p-6 text-[var(--on-accent)] sm:p-8">
+          <h2 id="reroute-rate-heading" className="text-[11px] font-semibold uppercase tracking-[0.1em] opacity-80">Reroute rate</h2>
+          <p className="mt-4 text-6xl font-semibold tracking-[-0.06em] tabular-nums">{formatPercent(stats.rerouteRate)}</p>
+          <p className="mt-3 mb-8 text-sm opacity-85">Share of verified returns approved for local delivery.</p>
+          <dl className="mt-auto grid grid-cols-2 gap-3 border-t border-current/25 pt-5">
             <div>
-              <dt className="text-xs text-slate-300">Total returns</dt>
-              <dd className="mt-1 text-lg font-semibold tabular-nums">{formatInteger(stats.totalReturns)}</dd>
+              <dt className="text-[11px] uppercase tracking-[0.1em] opacity-80">Total returns</dt>
+              <dd className="mt-1 text-xl font-semibold tabular-nums">{formatInteger(stats.totalReturns)}</dd>
             </div>
             <div>
-              <dt className="text-xs text-slate-300">Active reroutes</dt>
-              <dd className="mt-1 text-lg font-semibold tabular-nums">{formatInteger(stats.activeReroutes)}</dd>
+              <dt className="text-[11px] uppercase tracking-[0.1em] opacity-80">Active reroutes</dt>
+              <dd className="mt-1 text-xl font-semibold tabular-nums">{formatInteger(stats.activeReroutes)}</dd>
             </div>
           </dl>
         </section>
@@ -70,28 +71,27 @@ async function DashboardContent() {
 
 export default function DashboardPage() {
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 font-sans text-slate-950 sm:px-8 sm:py-12">
-      <div className="mx-auto max-w-6xl">
-        <header className="mb-7 flex flex-wrap items-end justify-between gap-5 sm:mb-9">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">Seller Dashboard</h1>
-            <p className="mt-2 text-sm text-slate-600 sm:text-base">Track returns, local reroutes and their impact.</p>
-          </div>
-          <nav aria-label="Seller tools" className="flex flex-wrap gap-2">
-            {sellerLinks.map(({ href, label }) => (
-              <Link key={href} href={href} className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-emerald-700">
-                {label}
-              </Link>
-            ))}
-            <Link href="/matches" className="rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700">
-              Review matches <span aria-hidden="true">→</span>
+    <main className={ui.page}>
+      <header className="mb-10 flex flex-wrap items-end justify-between gap-6 border-b border-[var(--line)] pb-8 sm:mb-12">
+        <div>
+          <p className={ui.eyebrow}>Seller workspace · Overview</p>
+          <h1 className={ui.pageTitle}>Seller dashboard</h1>
+          <p className="mt-4 max-w-xl text-base text-[var(--muted)]">Track returns, local reroutes and their impact.</p>
+        </div>
+        <nav aria-label="Seller tools" className="flex flex-wrap gap-2">
+          {sellerLinks.map(({ href, label }) => (
+            <Link key={href} href={href} className={ui.outlineButton}>
+              {label}
             </Link>
-          </nav>
-        </header>
-        <Suspense fallback={<p className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">Loading return metrics…</p>}>
-          <DashboardContent />
-        </Suspense>
-      </div>
+          ))}
+          <Link href="/matches" className={ui.primaryButton}>
+            Review matches <span aria-hidden="true">→</span>
+          </Link>
+        </nav>
+      </header>
+      <Suspense fallback={<p className={`${ui.card} text-sm text-[var(--muted)]`}>Loading return metrics…</p>}>
+        <DashboardContent />
+      </Suspense>
     </main>
   );
 }

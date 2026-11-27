@@ -1,0 +1,244 @@
+/*
+ * RIP seller workspace: the same identity as the customer store (components/store/polish.css),
+ * scoped to .rip-seller. Tailwind 4 utilities read colours from --color-* variables, so we remap
+ * those variables here. Person 3 pages pick up the RIP palette in light, dark and system modes.
+ */
+.rip-seller {
+  --paper: #f6f3ec;
+  --surface: #fffdf8;
+  --soft: #e9ece2;
+  --ink: #202e28;
+  --muted: #566359;
+  --line: #cbd1c4;
+  --olive: #3e624a;
+  --accent: #284c36;
+  --on-accent: #fffdf6;
+  --focus: #977c20;
+  --danger: #8b3027;
+  --danger-bg: #f8e5dc;
+  --warn: #7a5a12;
+  --warn-bg: #f4ead0;
+  --good-bg: #e3eadb;
+  --good-line: #b9c9b0;
+  color-scheme: light;
+}
+
+.rip-seller[data-theme='dark'] {
+  --paper: #141b17;
+  --surface: #1e2821;
+  --soft: #29362c;
+  --ink: #f0f0e5;
+  --muted: #bac5b9;
+  --line: #475348;
+  --olive: #becda6;
+  --accent: #cfdea9;
+  --on-accent: #19271b;
+  --focus: #e0c65b;
+  --danger: #ffc6b4;
+  --danger-bg: #472e29;
+  --warn: #f0d58c;
+  --warn-bg: #3d3420;
+  --good-bg: #263427;
+  --good-line: #4f6650;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  .rip-seller[data-theme='system'] {
+    --paper: #141b17;
+    --surface: #1e2821;
+    --soft: #29362c;
+    --ink: #f0f0e5;
+    --muted: #bac5b9;
+    --line: #475348;
+    --olive: #becda6;
+    --accent: #cfdea9;
+    --on-accent: #19271b;
+    --focus: #e0c65b;
+    --danger: #ffc6b4;
+    --danger-bg: #472e29;
+    --warn: #f0d58c;
+    --warn-bg: #3d3420;
+    --good-bg: #263427;
+    --good-line: #4f6650;
+    color-scheme: dark;
+  }
+}
+
+/* Tailwind palette → RIP tokens (inherited by every utility inside the seller workspace). */
+.rip-seller {
+  --color-white: var(--surface);
+  --color-black: var(--ink);
+
+  --color-slate-50: var(--paper);
+  --color-slate-100: var(--soft);
+  --color-slate-200: var(--line);
+  --color-slate-300: var(--line);
+  --color-slate-400: var(--muted);
+  --color-slate-500: var(--muted);
+  --color-slate-600: var(--muted);
+  --color-slate-700: var(--ink);
+  --color-slate-800: var(--ink);
+  --color-slate-900: var(--ink);
+  --color-slate-950: var(--ink);
+
+  --color-neutral-50: var(--paper);
+  --color-neutral-100: var(--soft);
+  --color-neutral-200: var(--line);
+  --color-neutral-300: var(--line);
+  --color-neutral-500: var(--muted);
+  --color-neutral-600: var(--muted);
+  --color-neutral-700: var(--ink);
+  --color-neutral-800: var(--ink);
+  --color-neutral-900: var(--ink);
+
+  --color-emerald-50: var(--good-bg);
+  --color-emerald-100: var(--good-bg);
+  --color-emerald-200: var(--good-line);
+  --color-emerald-500: var(--olive);
+  --color-emerald-600: var(--olive);
+  --color-emerald-700: var(--accent);
+  --color-emerald-800: var(--accent);
+  --color-emerald-900: var(--olive);
+  --color-emerald-950: var(--ink);
+
+  --color-sky-50: var(--soft);
+  --color-sky-100: var(--soft);
+  --color-sky-200: var(--line);
+  --color-sky-700: var(--olive);
+  --color-sky-800: var(--ink);
+  --color-sky-900: var(--ink);
+
+  --color-amber-50: var(--warn-bg);
+  --color-amber-100: var(--warn-bg);
+  --color-amber-200: var(--line);
+  --color-amber-800: var(--warn);
+  --color-amber-900: var(--warn);
+
+  --color-red-600: var(--danger);
+
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  font-family: var(--font-geist-sans), Arial, sans-serif;
+}
+
+.rip-seller :focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* Header: mirrors the store's top bar + wordmark header. */
+.rip-seller-topbar {
+  background: var(--accent);
+  color: var(--on-accent);
+  padding: 10px 4%;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+.rip-seller-header {
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  padding: 22px 4%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.rip-seller-logo {
+  font-size: 44px;
+  letter-spacing: -3px;
+  line-height: 1;
+  font-weight: 850;
+  color: var(--ink);
+}
+.rip-seller-logo span {
+  color: var(--olive);
+  margin-left: 8px;
+  font-size: 0.55em;
+  letter-spacing: 0;
+}
+.rip-seller-logo small {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.rip-seller-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  font-size: 14px;
+}
+.rip-seller-nav a {
+  color: var(--ink);
+  padding-bottom: 5px;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s, color 0.2s;
+}
+.rip-seller-nav a:hover {
+  color: var(--olive);
+}
+.rip-seller-nav a[aria-current='page'] {
+  border-bottom-color: currentColor;
+}
+.rip-seller .rip-theme-control {
+  display: grid;
+  gap: 3px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.rip-seller .rip-theme-control select {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  min-height: 40px;
+  padding: 8px;
+  font-size: 14px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Store language: square corners and flat surfaces inside the seller workspace. */
+.rip-seller main .rounded,
+.rip-seller main .rounded-md,
+.rip-seller main .rounded-lg,
+.rip-seller main .rounded-xl,
+.rip-seller main .rounded-2xl,
+.rip-seller main .rounded-3xl {
+  border-radius: 0;
+}
+.rip-seller main .shadow-sm,
+.rip-seller main .shadow,
+.rip-seller main .shadow-md,
+.rip-seller main .shadow-lg {
+  box-shadow: none;
+}
+
+/* Leaflet controls follow the theme; tiles stay as map imagery. */
+.rip-seller .leaflet-container {
+  background: var(--soft);
+}
+.rip-seller .leaflet-bar a {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+@media (max-width: 720px) {
+  .rip-seller-topbar span:last-child {
+    display: none;
+  }
+  .rip-seller-logo {
+    font-size: 36px;
+  }
+}
