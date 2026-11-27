@@ -1,6 +1,6 @@
 import type Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
-import type { Assessment, DeliveryView, ReturnView } from "./types";
+import type { DeliveryView, ReturnView } from "./types";
 
 export class WorkflowError extends Error {
   status: number;
@@ -40,48 +40,6 @@ export function operations(database: Database.Database) {
       .get(positiveId(id)) as ReturnView | undefined;
     if (!row) throw new WorkflowError("Return not found.", 404);
     return row;
-  }
-  function assess(id: number): Assessment {
-    const r = returnById(id);
-    return {
-      mode: "demo",
-      title: "Evidence readiness check",
-      findings: [
-        {
-          label: "Product identity",
-          detail: `Order records identify ${r.sku}. Visual identity has not been verified.`,
-          tone: "neutral",
-        },
-        {
-          label: "Reported condition",
-          detail: `Customer reported: ${r.condition.replaceAll("_", " ")}. This is not a physical inspection.`,
-          tone: r.condition === "damaged" ? "warning" : "neutral",
-        },
-        {
-          label: "Return photographs",
-          detail: r.image_url
-            ? "An image URL is supplied. This demo does not analyse its contents."
-            : "No return photograph supplied. Request evidence or inspect the item in person.",
-          tone: "warning",
-        },
-        {
-          label: "Damage & discrepancies",
-          detail:
-            "Not assessed. No image model is connected; damage and product discrepancies require human review.",
-          tone: "neutral",
-        },
-        {
-          label: "Packaging & accessories",
-          detail:
-            "Not assessed. Confirm packaging, included parts, and functionality during physical inspection.",
-          tone: "neutral",
-        },
-      ],
-      recommendation:
-        r.condition === "damaged"
-          ? "Review for the standard warehouse return process."
-          : "Human review required before local rerouting. Physical inspection remains mandatory.",
-    };
   }
   const decide = database.transaction(
     (id: number, action: unknown, notes: unknown) => {
@@ -413,7 +371,6 @@ export function operations(database: Database.Database) {
   return {
     returns,
     returnById,
-    assess,
     deliveries,
     delivery,
     decide: (id: number, action: unknown, notes: unknown) =>

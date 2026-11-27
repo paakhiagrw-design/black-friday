@@ -8,6 +8,7 @@ import {
   Icon,
   Loading,
   Notice,
+  OperationError,
   Shell,
   Stat,
   human,
@@ -23,6 +24,7 @@ export default function VerificationWorkspace() {
   const [selected, setSelected] = useState<number | null>(null);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [accessCode, setAccessCode] = useState("");
   const returns = feed.data?.returns ?? [];
   const filtered = returns.filter(
     (r) =>
@@ -162,8 +164,14 @@ export default function VerificationWorkspace() {
           </section>
           {current ? (
             <VerificationDetail
-              key={current.id}
+              key={JSON.stringify([
+                current.id,
+                current.catalogue_image,
+                current.image_url,
+              ])}
               item={current}
+              accessCode={accessCode}
+              setAccessCode={setAccessCode}
               refresh={feed.refresh}
             />
           ) : (
@@ -181,9 +189,13 @@ export default function VerificationWorkspace() {
 }
 function VerificationDetail({
   item: r,
+  accessCode,
+  setAccessCode,
   refresh,
 }: {
   item: ReturnView;
+  accessCode: string;
+  setAccessCode: (value: string) => void;
   refresh: () => Promise<void>;
 }) {
   const [assessment, setAssessment] = useState<Assessment | null>(null);
@@ -191,7 +203,8 @@ function VerificationDetail({
   const [notes, setNotes] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [scanRun, setScanRun] = useState(0);
+  const [scanError, setScanError] = useState("");
+  const [needsCode, setNeedsCode] = useState(false);
   const editable =
     ["requested", "approved"].includes(r.return_status) && !r.active_match;
   async function act(action: string) {
@@ -201,11 +214,14 @@ function VerificationDetail({
     setMessage("");
     try {
       if (action === "scan") {
-        setScanRun((v) => v + 1);
+        setAssessment(null);
+        setScanError("");
         const result = await post<{ assessment: Assessment }>(
           "/api/verification",
           { returnId: r.id, action },
+          accessCode ? { Authorization: `Bearer ${accessCode}` } : undefined,
         );
+        setNeedsCode(false);
         setAssessment(result.assessment);
       } else {
         await post("/api/verification", { returnId: r.id, action, notes });
@@ -219,7 +235,11 @@ function VerificationDetail({
         await refresh();
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Operation failed.");
+      const reason = e instanceof Error ? e.message : "Operation failed.";
+      if (action === "scan") {
+        setScanError(reason);
+        if (e instanceof OperationError && e.status === 401) setNeedsCode(true);
+      } else setError(reason);
     } finally {
       setBusy("");
     }
@@ -251,7 +271,6 @@ function VerificationDetail({
               url={r.image_url}
               label="Return evidence"
               scan={busy === "scan"}
-              scanRun={scanRun}
             />
           </div>
           <div className={s.evidenceCaption}>
@@ -306,54 +325,87 @@ function VerificationDetail({
             <Icon name="sparkle" />
             Vision Scan
           </h2>
-          <span className={`${s.badge} ${s.blue}`}>DEMO</span>
+          <span className={`${s.badge} ${s.green}`}>OpenAI</span>
         </div>
         <div className={s.assessmentBody}>
           <div className={`${s.scanOrb} ${busy === "scan" ? s.orbBusy : ""}`}>
             <Icon name="scan" size={36} />
           </div>
-          <h3>Clarity before the next step.</h3>
+          <h3>Compare product photographs</h3>
           <p className={s.muted}>
-            Check evidence readiness and review the return before making a
-            decision.
+            Send the catalogue and return images to OpenAI to compare visible
+            details.
           </p>
+          {needsCode && (
+            <label className={s.field}>
+              Seller scan access code
+              <input
+                type="password"
+                autoComplete="off"
+                value={accessCode}
+                onChange={(e) => setAccessCode(e.target.value)}
+              />
+            </label>
+          )}
           <button
             className={s.scanButton}
             onClick={() => void act("scan")}
-            disabled={!!busy}
+            disabled={!!busy || (needsCode && !accessCode)}
           >
             <Icon name={busy === "scan" ? "refresh" : "scan"} />
             {busy === "scan"
-              ? "Checking supplied records…"
+              ? "Comparing images…"
               : assessment
-                ? "Run verification again"
-                : "Run verification"}
+                ? "Check images again"
+                : "Run Vision Scan"}
           </button>
-          <p className={s.finePrint}>
-            Deterministic demo · No vision model connected.
-            <br />
-            No visual analysis or confidence score is generated.
+          <p className={s.finePrint} role="status">
+            {busy === "scan"
+              ? "Analysing visible evidence…"
+              : "Seller approval and physical inspection are required."}
           </p>
+          {scanError && <Notice error>{scanError}</Notice>}
           {assessment && (
             <div className={s.findings} aria-live="polite">
-              <div className={s.eyebrow}>ASSESSMENT FINDINGS</div>
+              <div className={s.eyebrow}>Vision findings</div>
+              <p className={s.finePrint}>
+                {assessment.model}
+                {assessment.cached && " · Previous scan of these images"}
+              </p>
               {assessment.findings.map((f, i) => (
                 <div
                   key={f.label}
                   className={s.finding}
-                  style={{ animationDelay: `${i * 70}ms` }}
+                  style={{ animationDelay: `${i * 110}ms` }}
                 >
                   <Icon
                     name={f.tone === "warning" ? "alert" : "scan"}
                     size={17}
                   />
                   <div>
-                    <strong>{f.label}</strong>
+                    <strong>{f.label}</strong>{" "}
+                    <small className={s.muted}>{human(f.status)}</small>
                     <p>{f.detail}</p>
                   </div>
                 </div>
               ))}
-              <div className={s.recommendation}>
+              <div
+                className={s.recommendation}
+                style={{ animationDelay: "770ms" }}
+              >
+                <strong>Visible discrepancies</strong>
+                {assessment.discrepancies.length ? (
+                  assessment.discrepancies.map((detail, index) => (
+                    <p key={index}>{detail}</p>
+                  ))
+                ) : (
+                  <p>OpenAI reported no visible discrepancies.</p>
+                )}
+              </div>
+              <div
+                className={s.recommendation}
+                style={{ animationDelay: "880ms" }}
+              >
                 <strong>Recommended next step</strong>
                 <p>{assessment.recommendation}</p>
               </div>

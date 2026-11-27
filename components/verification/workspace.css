@@ -690,12 +690,12 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: #60a5fa;
-  box-shadow: 0 0 16px 3px #60a5fa66;
+  background: #34d399;
+  box-shadow: 0 0 16px 3px #34d39966;
   animation: rip-scan 1.7s ease-in-out infinite;
 }
 .rip-scanning .rip-corners {
-  border-color: #60a5fa;
+  border-color: #34d399;
 }
 .rip-scanning::after {
   content: "";
@@ -705,7 +705,7 @@
     0deg,
     transparent,
     transparent 4px,
-    #60a5fa07 5px
+    #34d39907 5px
   );
   pointer-events: none;
 }
@@ -1955,16 +1955,15 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  animation: rip-scanPreview 1.6s linear forwards;
   background: repeating-linear-gradient(
     0deg,
     transparent,
     transparent 5px,
-    #60a5fa06 6px
+    #34d39906 6px
   );
 }
-.rip-scanPreview .rip-scanLine {
-  animation: rip-scan 1.6s ease-in-out 1;
+.rip-findings .rip-recommendation {
+  animation: rip-enter 0.35s ease both;
 }
 .rip-scanPreview > span {
   position: absolute;
@@ -1972,10 +1971,10 @@
   left: 12px;
   font-family: var(--font-geist-mono), monospace;
   font-size: 9px;
-  color: #93c5fd;
+  color: #6ee7b7;
   background: #101014c9;
   padding: 4px 6px;
-  border: 1px solid #60a5fa33;
+  border: 1px solid #34d39933;
   border-radius: 3px;
 }
 .rip-detail,
@@ -2008,16 +2007,6 @@
 }
 .rip-modalImage {
   min-width: 0;
-}
-@keyframes rip-scanPreview {
-  0%,
-  80% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    visibility: hidden;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .rip-app *,
