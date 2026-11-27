@@ -8,7 +8,7 @@ export async function GET() {
   return Response.json(
     {
       products: db.prepare("SELECT * FROM products ORDER BY id").all(),
-      customers: db.prepare("SELECT * FROM customers ORDER BY id").all(),
+      customers: db.prepare("SELECT id,name,address FROM customers ORDER BY id").all(),
       customer_id:
         Number((await cookies()).get("reroute-demo-customer")?.value) || null,
     },
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   try {
     sameOrigin(request);
     const body = await request.json();
-    const id = store.customer(positiveId(body.customer_id));
+    const id = store.customer(positiveId(body?.customer_id));
     (await cookies()).set("reroute-demo-customer", String(id), {
       httpOnly: true,
       sameSite: "lax",

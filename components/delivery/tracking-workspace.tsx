@@ -19,13 +19,15 @@ import RefundCard from "./refund-card";
 import RouteVisual from "./route-visual";
 export default function TrackingWorkspace({
   initialDelivery = null,
+  reference,
 }: {
   initialDelivery?: number | null;
+  reference?: string;
 }) {
   const feed = useFeed<{ deliveries: DeliveryView[] }>("/api/tracking");
   const [selected, setSelected] = useState<number | null>(initialDelivery);
   const rows = feed.data?.deliveries ?? [];
-  const d = rows.find((r) => r.delivery_id === selected) ?? rows[0];
+  const d = selected !== null ? rows.find(r => r.delivery_id === selected) : reference !== undefined ? rows.find(r => r.tracking_code === reference) : rows[0];
   return (
     <Shell
       active="tracking"
@@ -40,9 +42,10 @@ export default function TrackingWorkspace({
       ) : !d ? (
         <section className={s.panel}>
           <Empty
-            title="No deliveries yet"
-            detail="Arrange a collection from Delivery to create a unique tracking reference."
+            title={selected !== null || reference !== undefined ? "Tracking reference not found" : "No deliveries yet"}
+            detail="Check the reference or open the delivery list to select a collection."
           />
+          <Link className={s.secondary} href="/delivery">View deliveries</Link>
         </section>
       ) : (
         <>

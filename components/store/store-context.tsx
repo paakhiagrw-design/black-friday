@@ -118,7 +118,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         <Link
           href="/"
           className={styles.logo}
-          aria-label="RIP — Return. In Proximity. Home"
+          aria-label="RIP — Return In Proximity Home"
         >
           RIP<span>↻</span>
         </Link>
@@ -190,10 +190,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       </Context.Provider>
       <footer className={styles.footer}>
         <Link href="/" className="rip-footer-brand">
-          RIP<span>Return. In Proximity.</span>
+          RIP<span>Return In Proximity</span>
         </Link>
-        <p>Considered goods. A little less waste.</p>
+        <p>The end of unnecessary returns.</p>
+        <Link href="/dashboard" prefetch={false}>Seller dashboard</Link>
         <span>Dublin, Ireland · Demo store</span>
+        <a href="/PHOTO-CREDITS.txt">Photo credits</a>
       </footer>
     </div>
   );

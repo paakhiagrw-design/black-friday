@@ -1,21 +1,8 @@
 import "server-only";
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import { db } from "@/lib/db";
 import { acceptsOrigin } from "./request-origin";
 import { operations, WorkflowError } from "./core";
 
-db.transaction(() =>
-  db.exec(
-    readFileSync(
-      path.join(
-        process.cwd(),
-        "database/migrations/001_verification_delivery.sql",
-      ),
-      "utf8",
-    ),
-  ),
-)();
 export const ops = operations(db);
 export async function body(request: Request): Promise<Record<string, unknown>> {
   if (!acceptsOrigin(request))

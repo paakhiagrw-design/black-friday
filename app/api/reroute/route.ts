@@ -1,3 +1,4 @@
+import { acceptsOrigin } from '@/lib/operations/request-origin';
 import { db } from '@/lib/db';
 import { approveReroute, cancelReroute, type RerouteResult } from '@/lib/logistics/repository';
 import type { RerouteErrorCode, RerouteErrorResponse } from '@/lib/logistics/types';
@@ -37,6 +38,7 @@ function respond(result: RerouteResult, successStatus: number) {
 
 /** Approve a reroute: { returnId, buyerOrderId } → 201 { match }. */
 export async function POST(request: Request) {
+  if (!acceptsOrigin(request)) return Response.json({ message: "Cross-origin writes are not allowed." }, { status: 403 });
   const body = await readJson(request);
   if (!body || !isId(body.returnId) || !isId(body.buyerOrderId)) {
     return invalid('Body must be { returnId: number, buyerOrderId: number }');
@@ -46,6 +48,7 @@ export async function POST(request: Request) {
 
 /** Cancel an accepted reroute before dispatch: { matchId } → 200 { match }. */
 export async function DELETE(request: Request) {
+  if (!acceptsOrigin(request)) return Response.json({ message: "Cross-origin writes are not allowed." }, { status: 403 });
   const body = await readJson(request);
   if (!body || !isId(body.matchId)) return invalid('Body must be { matchId: number }');
   return respond(cancelReroute(db, body.matchId), 200);

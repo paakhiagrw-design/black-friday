@@ -5,6 +5,7 @@ import type { CostBreakdown, GeoPoint, RouteEstimate } from './types';
 
 interface ReturnRow extends GeoPoint {
   productName: string;
+  reward: number;
   sku: string;
 }
 
@@ -55,7 +56,7 @@ export function getRouteView(
 ): RouteView {
   const returnRow = db.prepare<[number], ReturnRow>(`
     SELECT c.name AS label, c.latitude AS lat, c.longitude AS lng,
-           p.name AS productName, p.sku
+           p.name AS productName, p.sku, r.reward_amount AS reward
     FROM returns r
     JOIN orders o ON o.id = r.order_id
     JOIN customers c ON c.id = o.customer_id
@@ -74,8 +75,8 @@ export function getRouteView(
     return { status: 'not_found', missingReturn: !returnRow, missingBuyerOrder: !buyer };
   }
 
-  const { productName, sku, ...returner } = returnRow;
-  const config = DEFAULT_COST_CONFIG;
+  const { productName, sku, reward, ...returner } = returnRow;
+  const config = reward > 0 ? { ...DEFAULT_COST_CONFIG, rewardCents: reward } : DEFAULT_COST_CONFIG;
   const legs = legDistances(returner, buyer, config);
 
   return {

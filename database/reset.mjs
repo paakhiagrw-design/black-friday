@@ -1,11 +1,7 @@
-import Database from 'better-sqlite3';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { openDatabase } from './open.mjs';
+const database = openDatabase();
 
-const directory = path.dirname(fileURLToPath(import.meta.url));
-const database = new Database(path.join(directory, 'reroute.db'));
-database.pragma('foreign_keys = ON');
 database.transaction(() => {
-  database.exec('DELETE FROM deliveries; DELETE FROM matches; DELETE FROM returns; DELETE FROM orders; DELETE FROM products; DELETE FROM customers;');
+  database.exec('DELETE FROM checkout_receipts; DELETE FROM operation_refund_receipts; DELETE FROM operation_delivery_events; DELETE FROM operation_inspections; DELETE FROM operation_collections; DELETE FROM deliveries; DELETE FROM matches; DELETE FROM returns; DELETE FROM orders; DELETE FROM products; DELETE FROM customers;');
 })();
 database.close();

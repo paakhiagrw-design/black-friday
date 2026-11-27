@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- Local upload previews use object URLs. */
 "use client";
 import Link from "next/link";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { Order, ReturnRequest, Product } from "@/lib/types";
 import { api, useStore } from "./store-context";
 import { ProductImage } from "./product-image";
@@ -244,15 +244,26 @@ export function Cart() {
     (n, l) => n + (l.product?.price || 0) * l.quantity,
     0,
   );
+  const intent = useRef<{ cart: string; key: string } | null>(null);
   async function checkout() {
     setBusy(true);
     setError("");
     try {
+      const body = JSON.stringify({ items: cart, consent });
+      const storageKey = 'rip-checkout-' + customer?.id;
+      try {
+        const saved = JSON.parse(sessionStorage.getItem(storageKey) || 'null');
+        if (saved?.cart === body && typeof saved.key === 'string') intent.current = saved;
+      } catch { /* Storage can be disabled in a private window. */ }
+      if (intent.current?.cart !== body) intent.current = {cart: body, key: crypto.randomUUID()};
+      try { sessionStorage.setItem(storageKey, JSON.stringify(intent.current)); } catch {}
       const result = await api("/api/checkout", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: cart, consent }),
+        headers: { "Content-Type": "application/json", "Idempotency-Key": intent.current.key },
+        body,
       });
+      intent.current = null;
+      try { sessionStorage.removeItem(storageKey); } catch {}
       setDone(result);
       setCart([]);
     } catch (e) {

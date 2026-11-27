@@ -2,6 +2,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import { open, realpath } from "node:fs/promises";
 import path from "node:path";
+import { uploadsDirectory } from "@/database/storage.mjs";
 import { WorkflowError } from "../core";
 
 const maxBytes = 5 * 1024 * 1024;
@@ -101,7 +102,7 @@ export async function evidence(src: string, label: string): Promise<Evidence> {
   const stored = upload.exec(src);
   if (stored) {
     bytes = await readLocal(
-      path.join(process.cwd(), "database/store-uploads"),
+      uploadsDirectory(),
       stored[1],
       label,
     );

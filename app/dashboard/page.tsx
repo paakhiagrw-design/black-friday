@@ -17,6 +17,7 @@ import { db } from '@/lib/db';
 export const metadata: Metadata = { title: 'Seller Dashboard | RIP — Return In Proximity' };
 
 const sellerLinks = [
+  { href: '/store', label: 'Storefront' },
   { href: '/verification', label: 'Verify returns' },
   { href: '/delivery', label: 'Manage deliveries' },
   { href: '/analytics', label: 'View analytics' },
@@ -70,7 +71,7 @@ async function DashboardContent() {
 
 export default function DashboardPage() {
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 font-sans text-slate-950 sm:px-8 sm:py-12">
+    <main className="rip-seller min-h-screen bg-slate-50 px-4 py-8 font-sans text-slate-950 sm:px-8 sm:py-12">
       <div className="mx-auto max-w-6xl">
         <header className="mb-7 flex flex-wrap items-end justify-between gap-5 sm:mb-9">
           <div>

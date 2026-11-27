@@ -199,7 +199,7 @@ async function RouteContent({ searchParams }: Pick<PageProps<'/logistics'>, 'sea
 
 export default function LogisticsPage({ searchParams }: PageProps<'/logistics'>) {
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-950">
+    <main className="rip-seller min-h-screen bg-slate-50 text-slate-950">
       <div className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-8 sm:py-9">
         <header className="space-y-4">
           <Link href="/matches" className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-800 hover:underline">
