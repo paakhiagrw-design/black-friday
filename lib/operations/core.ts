@@ -258,6 +258,7 @@ export function operations(database: Database.Database) {
         database
           .prepare(`UPDATE deliveries SET delivery_status='failed' WHERE id=?`)
           .run(id);
+        database.prepare("UPDATE orders SET fulfillment_status='unfulfilled' WHERE id=? AND fulfillment_status='processing'").run(d.buyer_order_id);
         database
           .prepare(`UPDATE matches SET match_status='failed' WHERE id=?`)
           .run(d.match_id);

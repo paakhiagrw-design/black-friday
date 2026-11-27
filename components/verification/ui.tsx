@@ -126,6 +126,8 @@ export function Icon({ name, size = 20 }: { name: string; size?: number }) {
   );
 }
 const nav = [
+  ["dashboard", "box", "Dashboard"],
+  ["matches", "route", "Matches"],
   ["verification", "scan", "Verification"],
   ["inspection", "shield", "Inspection"],
   ["delivery", "truck", "Delivery"],
@@ -183,7 +185,7 @@ export function Shell({
         <div className={s.sidebarBottom}>
           <div className={s.network}>
             <span className={s.liveDot} />
-            Local demo environment
+            Demo workspace
           </div>
           <p>
             The end of

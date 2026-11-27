@@ -15,6 +15,10 @@ export function acceptsOrigin(request: Request) {
     origin === `${internal.protocol}//${request.headers.get("host")}`
   )
     return true;
+  // TLS can end at Railway before Next receives the request. Compare the actual Host,
+  // never an arbitrary forwarded-host list, when the public request used HTTPS.
+  const host = request.headers.get("host");
+  if (host && origin === `https://${host}` && !isLoopbackRequest(request)) return true;
   const domain = process.env.RAILWAY_PUBLIC_DOMAIN;
   return (
     (Boolean(domain) && origin === `https://${domain}`) ||

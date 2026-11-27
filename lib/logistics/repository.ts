@@ -19,6 +19,7 @@ interface ReturnRow {
   condition: string;
   verification_status: string;
   return_status: string;
+  reward_amount: number;
   product_id: number;
   sku: string;
   product_name: string;
@@ -57,7 +58,7 @@ interface MatchRow {
 }
 
 const RETURN_SQL = `
-  SELECT r.id AS return_id, r.order_id, r.condition, r.verification_status, r.return_status,
+  SELECT r.id AS return_id, r.order_id, r.condition, r.verification_status, r.return_status, r.reward_amount,
          p.id AS product_id, p.sku, p.name AS product_name, p.price, p.image_url,
          c.id AS customer_id, c.name AS customer_name, c.address, c.latitude, c.longitude
   FROM returns r
@@ -144,7 +145,7 @@ function loadEngineInput(database: DB, row: ReturnRow): EngineInput {
 }
 
 function evaluateRow(database: DB, row: ReturnRow, overrides?: Partial<CostConfig>) {
-  return evaluateReturn(loadEngineInput(database, row), overrides);
+  return evaluateReturn(loadEngineInput(database, row), row.reward_amount > 0 ? { ...overrides, rewardCents: row.reward_amount } : overrides);
 }
 
 /** Match results for every return (ordered by id), or just one when returnId is given. */
@@ -258,7 +259,7 @@ export function approveReroute(
       matchId = Number(info.lastInsertRowid);
     }
 
-    database.prepare(`UPDATE returns SET return_status = 'matched' WHERE id = ?`).run(returnId);
+    database.prepare(`UPDATE returns SET return_status = 'matched', reward_amount = ? WHERE id = ?`).run(costs.rewardCents, returnId);
     database
       .prepare(`UPDATE orders SET fulfillment_status = 'processing' WHERE id = ?`)
       .run(buyerOrderId);

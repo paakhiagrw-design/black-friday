@@ -1,5 +1,5 @@
 import "server-only";
-import { createHash, timingSafeEqual } from "node:crypto";
+import { validSellerCredential } from "../seller-access";
 import { isLoopbackRequest } from "../request-origin";
 import { WorkflowError } from "../core";
 import type { Assessment, ReturnView } from "../types";
@@ -30,12 +30,7 @@ export function authorizeScan(request: Request) {
       503,
     );
   }
-  const header = request.headers.get("authorization");
-  const digest = (s: string) => createHash("sha256").update(s).digest();
-  if (
-    !header?.startsWith("Bearer ") ||
-    !timingSafeEqual(digest(header.slice(7)), digest(token))
-  )
+  if (!validSellerCredential(request))
     throw new WorkflowError(
       "Enter your seller scan access code to run Vision Scan.",
       401,

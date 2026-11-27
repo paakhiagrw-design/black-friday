@@ -4,9 +4,9 @@ const key = "rip-theme";
 function read() {
   try {
     const value = localStorage.getItem(key);
-    return value === "light" || value === "dark" ? value : "system";
+    return value === "system" || value === "light" ? value : "dark";
   } catch {
-    return "system";
+    return "dark";
   }
 }
 function subscribe(listener: () => void) {
@@ -18,7 +18,7 @@ function subscribe(listener: () => void) {
   };
 }
 export function useCustomerTheme() {
-  return useSyncExternalStore(subscribe, read, () => "system");
+  return useSyncExternalStore(subscribe, read, () => "dark");
 }
 export function ThemeToggle() {
   const theme = useCustomerTheme();

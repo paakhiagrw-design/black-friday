@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { uploadsDirectory } from "@/database/storage.mjs";
 import { db } from "@/lib/db";
 export async function GET(
   _request: Request,
@@ -15,7 +16,7 @@ export async function GET(
     return new Response("Not found", { status: 404 });
   try {
     return new Response(
-      await readFile(path.join(process.cwd(), "database/store-uploads", name)),
+      await readFile(path.join(uploadsDirectory(), name)),
       {
         headers: {
           "Content-Type": "image/webp",

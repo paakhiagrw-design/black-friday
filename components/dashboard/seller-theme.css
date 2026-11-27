@@ -24,14 +24,14 @@
 }
 
 .rip-seller[data-theme='dark'] {
-  --paper: #141b17;
-  --surface: #1e2821;
-  --soft: #29362c;
+  --paper: #101617;
+  --surface: #1b2323;
+  --soft: #24312c;
   --ink: #f0f0e5;
   --muted: #bac5b9;
-  --line: #475348;
-  --olive: #becda6;
-  --accent: #cfdea9;
+  --line: #42524c;
+  --olive: #a7d7bd;
+  --accent: #a1efc5;
   --on-accent: #19271b;
   --focus: #e0c65b;
   --danger: #ffc6b4;

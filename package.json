@@ -5,12 +5,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "prestart": "node database/startup.mjs",
     "start": "next start",
     "lint": "eslint",
     "db:init": "node database/init.mjs",
     "db:seed": "node database/seed.mjs",
     "db:reset": "node database/init.mjs && node database/reset.mjs && node database/seed.mjs",
     "test": "vitest run",
+    "test:operations": "node --experimental-strip-types --test lib/operations/workflow.test.mjs lib/operations/vision/comparison.test.mjs lib/operations/vision/origin.test.mjs tests/storage.test.mjs",
     "test:store": "node --experimental-strip-types --test tests/store/*.test.mjs",
     "test:store:http": "node tests/store/run-http.mjs"
   },

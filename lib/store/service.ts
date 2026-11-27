@@ -32,7 +32,8 @@ export function storeService(db: Database.Database) {
     const order = db
       .prepare("SELECT * FROM orders WHERE id = ? AND customer_id = ?")
       .get(orderId, customerId) as
-      { payment_status: string; fulfillment_status: string } | undefined;
+      | { payment_status: string; fulfillment_status: string }
+      | undefined;
     if (!order) throw new StoreError("Order not found for this customer.", 404);
     if (db.prepare("SELECT id FROM returns WHERE order_id = ?").get(orderId))
       throw new StoreError("A return already exists for this order.", 409);
@@ -48,7 +49,7 @@ export function storeService(db: Database.Database) {
   return {
     customer,
     eligible,
-    checkout(customerId: number, body: unknown) {
+    checkout(customerId: number, body: unknown, requestKey?: string | null) {
       customer(customerId);
       if (!body || typeof body !== "object")
         throw new StoreError("Invalid checkout.");
@@ -60,6 +61,8 @@ export function storeService(db: Database.Database) {
         items.length > 50
       )
         throw new StoreError("Choose items and a valid consent preference.");
+      if (requestKey != null && !/^[a-zA-Z0-9-]{16,80}$/.test(requestKey))
+        throw new StoreError("Invalid checkout request key.");
       const lines = items.map((item) => {
         if (!item || typeof item !== "object")
           throw new StoreError("Invalid cart item.");
@@ -76,32 +79,63 @@ export function storeService(db: Database.Database) {
         throw new StoreError(
           "Cart must contain unique products and at most 50 units.",
         );
-      return db.transaction(() => {
-        let total = 0;
-        const orderIds: number[] = [];
-        const insert = db.prepare(
-          "INSERT INTO orders (customer_id, product_id, quantity, payment_status, fulfillment_status, reroute_consent) VALUES (?, ?, 1, 'paid', 'unfulfilled', ?)",
-        );
-        for (const line of lines) {
-          const product = db
-            .prepare("SELECT * FROM products WHERE id = ?")
-            .get(line.productId) as Product | undefined;
-          if (!product)
-            throw new StoreError(
-              "A product is no longer available. Refresh your cart.",
-              409,
+      return db
+        .transaction(() => {
+          const cart = JSON.stringify({ lines, consent });
+          if (requestKey) {
+            const saved = db
+              .prepare(
+                "SELECT cart_json, result_json FROM checkout_receipts WHERE customer_id=? AND request_key=?",
+              )
+              .get(customerId, requestKey) as
+              | { cart_json: string; result_json: string }
+              | undefined;
+            if (saved) {
+              if (saved.cart_json !== cart)
+                throw new StoreError(
+                  "This checkout key belongs to another cart.",
+                  409,
+                );
+              return JSON.parse(saved.result_json) as {
+                order_ids: number[];
+                total: number;
+              };
+            }
+          }
+          let total = 0;
+          const orderIds: number[] = [];
+          const insert = db.prepare(
+            "INSERT INTO orders (customer_id, product_id, quantity, payment_status, fulfillment_status, reroute_consent) VALUES (?, ?, 1, 'paid', 'unfulfilled', ?)",
+          );
+          for (const line of lines) {
+            const product = db
+              .prepare("SELECT * FROM products WHERE id = ?")
+              .get(line.productId) as Product | undefined;
+            if (!product)
+              throw new StoreError(
+                "A product is no longer available. Refresh your cart.",
+                409,
+              );
+            total += product.price * line.quantity;
+            for (let i = 0; i < line.quantity; i++)
+              orderIds.push(
+                Number(
+                  insert.run(customerId, product.id, Number(consent))
+                    .lastInsertRowid,
+                ),
+              );
+          }
+          const result = { order_ids: orderIds, total };
+          if (requestKey)
+            db.prepare("INSERT INTO checkout_receipts VALUES (?,?,?,?)").run(
+              customerId,
+              requestKey,
+              cart,
+              JSON.stringify(result),
             );
-          total += product.price * line.quantity;
-          for (let i = 0; i < line.quantity; i++)
-            orderIds.push(
-              Number(
-                insert.run(customerId, product.id, Number(consent))
-                  .lastInsertRowid,
-              ),
-            );
-        }
-        return { order_ids: orderIds, total };
-      })();
+          return result;
+        })
+        .immediate();
     },
     submitReturn(
       customerId: number,
@@ -118,19 +152,21 @@ export function storeService(db: Database.Database) {
         throw new StoreError(
           "Provide a reason (5–1000 characters) and a valid condition.",
         );
-      return db.transaction(() => {
-        eligible(customerId, orderId);
-        const result = db
-          .prepare(
-            "INSERT INTO returns (order_id,reason,condition,image_url,verification_status,return_status,refund_status) VALUES (?,?,?,?,'pending','requested','pending')",
-          )
-          .run(orderId, reason.trim(), condition, photo);
-        return {
-          id: Number(result.lastInsertRowid),
-          verification_status: "pending",
-          return_status: "requested",
-        };
-      })();
+      return db
+        .transaction(() => {
+          eligible(customerId, orderId);
+          const result = db
+            .prepare(
+              "INSERT INTO returns (order_id,reason,condition,image_url,verification_status,return_status,refund_status) VALUES (?,?,?,?,'pending','requested','pending')",
+            )
+            .run(orderId, reason.trim(), condition, photo);
+          return {
+            id: Number(result.lastInsertRowid),
+            verification_status: "pending",
+            return_status: "requested",
+          };
+        })
+        .immediate();
     },
     orders(customerId: number) {
       customer(customerId);

@@ -1,10 +1,7 @@
-import Database from 'better-sqlite3';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { openDatabase } from './open.mjs';
+import { prepareDemo } from './demo.mjs';
+const database = openDatabase();
 
-const directory = path.dirname(fileURLToPath(import.meta.url));
-const database = new Database(path.join(directory, 'reroute.db'));
-database.pragma('foreign_keys = ON');
 
 const customers = [
   ['Aoife Byrne', 'aoife.byrne@example.test', 53.3498, -6.2603, '12 Cedar Lane, Dublin 2'],
@@ -90,7 +87,8 @@ const seed = database.transaction(() => {
 });
 
 try {
-  seed();
+  seed.immediate();
+  prepareDemo(database);
   console.log('Demo data seeded (existing records preserved).');
 } finally {
   database.close();

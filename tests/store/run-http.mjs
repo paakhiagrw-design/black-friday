@@ -21,7 +21,9 @@ try {
       recursive: true,
     });
   await mkdir(path.join(directory, "database"));
-  await cp("database/schema.sql", path.join(directory, "database/schema.sql"));
+  for (const entry of ["schema.sql", "storage.mjs", "open.mjs", "migrations"]) {
+    await cp(path.join("database", entry), path.join(directory, "database", entry), { recursive: true });
+  }
   await symlink(
     path.join(root, "node_modules"),
     path.join(directory, "node_modules"),
@@ -47,8 +49,9 @@ try {
     {
       cwd: directory,
       stdio: ["ignore", "pipe", "pipe"],
-      env: { ...process.env, RAILWAY_PUBLIC_DOMAIN: publicDomain },
+      env: { ...process.env, RAILWAY_PUBLIC_DOMAIN: publicDomain, DATABASE_PATH: path.join(directory, "database/reroute.db") },
     },
+
   );
   server.stdout.on("data", (chunk) => {
     logs += chunk;

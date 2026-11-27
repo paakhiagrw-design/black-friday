@@ -8,20 +8,22 @@ export const metadata: Metadata = {
 async function TrackingContent({
   searchParams,
 }: {
-  searchParams: Promise<{ delivery?: string }>;
+  searchParams: Promise<{ delivery?: string; reference?: string }>;
 }) {
   const params = await searchParams;
-  const id = Number(params.delivery);
+  const id = params.delivery === undefined ? null : Number(params.delivery);
   return (
     <TrackingWorkspace
-      initialDelivery={Number.isSafeInteger(id) && id > 0 ? id : null}
+      key={JSON.stringify([params.delivery, params.reference])}
+      initialDelivery={id === null ? null : Number.isSafeInteger(id) && id > 0 ? id : -1}
+      reference={params.reference}
     />
   );
 }
 export default function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ delivery?: string }>;
+  searchParams: Promise<{ delivery?: string; reference?: string }>;
 }) {
   return (
     <Suspense fallback={<TrackingWorkspace />}>

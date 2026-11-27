@@ -1,4 +1,4 @@
-# ReRoute database
+# RIP database
 
 This folder owns the shared SQLite database for the initial single-retailer MVP. It uses `better-sqlite3`; keep database access in Node.js server code. Do not import `lib/db.ts` from a Client Component or an Edge Runtime module. `lib/db.ts` exports one process-wide connection as `db`, enables SQLite foreign keys, and applies the idempotent schema when opened.
 
@@ -12,7 +12,7 @@ npm run db:init
 npm run db:seed
 ```
 
-`db:init` creates missing tables and indexes without removing rows. `db:seed` inserts the shared demo fixture with fixed IDs and `INSERT OR IGNORE`, so rerunning it does not add duplicates. `npm run db:reset` explicitly deletes local records and repopulates the fixture. The generated `database/reroute.db` and WAL/SHM files are local and ignored by git; share schema, scripts, types, and migrations through source control, not the database file.
+`db:init` creates missing tables and indexes without removing rows. `db:seed` inserts the shared demo fixture with fixed IDs and `INSERT OR IGNORE`, so rerunning it does not add duplicates. `npm run db:reset` explicitly deletes local records and repopulates the fixture. The repository contains a historic tracked demo snapshot. Keep generated databases, journals and uploads out of commits. Use `DATABASE_PATH` to select a separate file. All scripts and the server use the same path, with uploads in the adjacent `store-uploads` directory.
 
 Import the connection only from server-side code:
 
@@ -22,7 +22,7 @@ import { db } from '@/lib/db';
 const orders = db.prepare('SELECT * FROM orders WHERE customer_id = ?').all(customerId);
 ```
 
-Use prepared statements for values and `db.transaction(...)` for related writes. When changing columns or status values, update `schema.sql`, `lib/types.ts`, seed data, and this document together. Coordinate schema edits before building feature queries against them. There are no feature-specific API routes, authentication, payment processing, or courier connections in this foundation.
+Use prepared statements for values and `db.transaction(...)` for related writes. When changing columns or status values, update `schema.sql`, `lib/types.ts`, seed data, and this document together. Coordinate schema edits before building feature queries against them. The operations and checkout migrations run during initialisation. See the project README for the integrated app and simulator contracts.
 
 ## Money and MVP assumptions
 
@@ -58,4 +58,6 @@ These values are constrained in SQL and mirrored as union types in `lib/types.ts
 
 ## Demo fixture
 
-The seed contains 20 fictional Dublin-area customers, 10 products, 30 one-item orders, five returns, one example match, and one pending delivery. Return 1 is paired with a paid, unfulfilled, consented same-SKU order about 0.7 km away. Traditional cost is €12.00 and reroute cost €4.50, saving €7.50. Other returns cover a nearby different-SKU buyer, no nearby same-SKU buyer, failed verification, and a nearby same-SKU buyer who has not consented.
+The original fixture contains 20 fictional Dublin-area customers, 10 products, 30 one-item orders, five returns, one example match, and one pending delivery. Return 1 is paired with a paid, unfulfilled, consented same-SKU order about 0.7 km away. Traditional cost is €12.00 and reroute cost €4.50, saving €7.50. Other returns cover a nearby different-SKU buyer, no nearby same-SKU buyer, failed verification, and a nearby same-SKU buyer who has not consented.
+
+The presentation seed adds a photographed Raspberry Pi and two delivered purchases for Aoife and Niamh. See [the three-minute demo](../DEMO.md).

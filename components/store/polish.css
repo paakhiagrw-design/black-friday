@@ -724,3 +724,11 @@
     grid-template-columns: 1fr;
   }
 }
+.rr-store-shell[data-theme="dark"] {
+  --paper: #101617;
+  --surface: #1b2323;
+  --soft: #24312c;
+  --line: #42524c;
+  --olive: #a7d7bd;
+  --accent: #a1efc5;
+}

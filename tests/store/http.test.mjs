@@ -108,17 +108,19 @@ test(
     assert.equal(image.status, 200);
     assert.equal(image.headers.get("content-type"), "image/webp");
     assert.ok((await image.arrayBuffer()).byteLength > 0);
-    const checkout = await request("/api/checkout", {
+    const checkoutOptions = {
       method: "POST",
-      headers: { cookie: b, "Content-Type": "application/json" },
+      headers: { cookie: b, "Content-Type": "application/json", "Idempotency-Key": crypto.randomUUID() },
       body: JSON.stringify({
         items: [{ product_id: order.product_id, quantity: 2 }],
         consent: true,
       }),
-    });
+    };
+    const checkout = await request("/api/checkout", checkoutOptions);
     assert.equal(checkout.status, 201);
     const placed = await checkout.json();
     assert.equal(placed.order_ids.length, 2);
+    assert.deepEqual(await (await request("/api/checkout", checkoutOptions)).json(), placed);
     const orders = await (
       await request("/api/orders", { headers: { cookie: b } })
     ).json();
