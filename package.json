@@ -9,10 +9,12 @@
     "lint": "eslint",
     "db:init": "node database/init.mjs",
     "db:seed": "node database/seed.mjs",
-    "db:reset": "node database/init.mjs && node database/reset.mjs && node database/seed.mjs"
+    "db:reset": "node database/init.mjs && node database/reset.mjs && node database/seed.mjs",
+    "test": "vitest run"
   },
   "dependencies": {
     "better-sqlite3": "^13.2.0",
+    "leaflet": "^1.9.4",
     "next": "16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0"
@@ -20,12 +22,14 @@
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
     "@types/better-sqlite3": "^9.6.0",
+    "@types/leaflet": "^1.9.23",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "tailwindcss": "4.3.3",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.12"
   }
 }
