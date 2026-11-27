@@ -2,6 +2,7 @@ import "server-only";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { db } from "@/lib/db";
+import { acceptsOrigin } from "./request-origin";
 import { operations, WorkflowError } from "./core";
 
 db.transaction(() =>
@@ -17,8 +18,7 @@ db.transaction(() =>
 )();
 export const ops = operations(db);
 export async function body(request: Request): Promise<Record<string, unknown>> {
-  const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin)
+  if (!acceptsOrigin(request))
     throw new WorkflowError("Cross-origin writes are not allowed.", 403);
   if (!request.headers.get("content-type")?.includes("application/json"))
     throw new WorkflowError("Send a JSON request.", 415);

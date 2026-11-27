@@ -6,7 +6,18 @@ RIP means Return In Proximity. Tagline: “The end of unnecessary returns.” Br
 
 Use the existing `npm run dev`, then open `/verification`, `/inspection`, `/delivery` or `/tracking`. No packages were added. All pages use the existing Geist font. The module stylesheet is `components/verification/workspace.css`, with unique `rip-` class and animation prefixes. The repository’s `*.css` Turbopack rule treats CSS modules as plain CSS, so explicit namespacing is intentional; no shared config or global styles were changed.
 
-This is the existing unauthenticated, single-retailer local demo. Do not expose the operations APIs publicly until the team adds seller/inspector authorization. Same-origin checks on browser writes are CSRF protection, not authentication. No real courier, payment or vision provider is connected. Vision Scan is a deterministic evidence-readiness assessment and never claims to analyse photographs. Its labelled scan animation is a visual demonstration, does not delay the response, and respects reduced motion.
+The shared seller/inspection workflow is a single-retailer prototype. Restrict access to the operations workspace until retailer authentication is integrated. Courier and refund actions are simulated.
+
+## OpenAI Vision Scan
+
+Vision Scan sends the catalogue photograph and customer upload to the OpenAI Responses API with `store: false`. Only the two images and comparison instructions are sent. Seven structured findings cover identity, appearance, colour, visible condition, damage, packaging and accessories. Evidence outside the frame can be marked inconclusive. The scan returns discrepancies, a human review recommendation, the actual model and a provider response ID. It writes no decision or inspection record.
+
+- Set `OPENAI_API_KEY` in local server environment or Railway service variables. The default model is `gpt-4.1-mini`. Override it with `OPENAI_VISION_MODEL` only for a model supporting images and strict structured output.
+- For production or Railway, set a separate random `RIP_VISION_ACCESS_TOKEN` and share it privately with sellers. The scan panel prompts for this code. It stays in component memory. Localhost development also works with just the OpenAI key. Railway’s generated HTTPS domain is recognized automatically. For a custom domain behind a reverse proxy, set `RIP_PUBLIC_ORIGIN` to the exact public HTTPS origin without a trailing slash.
+- Set `products.image_url` to the actual reference image. The storefront's decorative seed fallbacks are unsuitable for identity checks. For `returns.image_url`, the scan supports the storefront's `/api/returns/photos/<uuid>.webp` path. The application and scanner must share the same `database/store-uploads` directory on Railway's persistent volume.
+- Both slots accept images under `public/` or HTTPS URLs on trusted hosts. Set `RIP_VISION_IMAGE_HOSTS` to a comma-separated list of exact catalogue or evidence hostnames (default `images.unsplash.com`). Server fetches reject redirects. JPEG, PNG and WebP have a 5 MiB input limit per photo.
+- Per server process, identical in-flight requests share one call. Completed results are reused for one hour for the same return, model and photo bytes. The server permits two concurrent scans, a 30-second retry interval per return, and 12 provider attempts per rolling hour. Failures count as attempts. Limits and cache reset on restart and apply independently to each replica.
+- Missing images return HTTP 422. Configuration, quota, access and upstream failures return explicit errors. Scanning has no effect on seller approval or mandatory physical inspection. Vision Scan requires no additional migration.
 
 ## Approved additive migration
 
@@ -23,7 +34,7 @@ Schema is also usable manually with `sqlite3 database/reroute.db < database/migr
 
 ## Team contracts
 
-Person 1 supplies returns in the existing `returns` table, with a real `image_url` where available. Relative same-origin image paths and HTTP(S) images are supported. Missing, broken, and `images.example.test` seed images show honest evidence placeholders.
+Person 1 supplies returns in the existing `returns` table, with a real `image_url` where available. The browser preview supports relative same-origin paths and HTTP(S) images. The server-side scanner accepts the sources described above. Missing, broken, and `images.example.test` seed images show honest evidence placeholders.
 
 Seller approval sets `verification_status=verified` and `return_status=approved`. It changes only those fields and `verification_notes`. Person 3 can discover these returns using those states. Review sets `pending/requested`; exclusion sets `failed/rejected`. Neither changes the refund status. Verification cannot alter a return with an active match or one already beyond the verification stage.
 
@@ -62,6 +73,8 @@ Inspection checks are booleans; pass requires all five true, exact observed SKU 
 
 ## Verification
 
-Run `npm run lint`, `npx tsc --noEmit`, `npm run build`, and `node --experimental-strip-types --test lib/operations/workflow.test.mjs` (Node 22.23+). The workflow tests use isolated SQLite fixtures and cover full delivery/refund persistence, invalid transitions, duplicates, buyer eligibility, failure fallback, validation and transaction rollback. They never modify the shared database.
+Run `npm run lint`, `npx tsc --noEmit`, `npm run build`, and `node --experimental-strip-types --test lib/operations/workflow.test.mjs lib/operations/vision/comparison.test.mjs lib/operations/vision/origin.test.mjs` (Node 22.23+). The workflow tests use isolated SQLite fixtures and cover full delivery/refund persistence, invalid transitions, duplicates, buyer eligibility, failure fallback, validation and transaction rollback. They never modify the shared database.
+
+The opt-in live test uses two prepared return IDs in an isolated database. Give both the same catalogue reference, then supply another view of that product for the first return and a different product for the second. Start the local server and run `RIP_LIVE_VISION=1 RIP_TEST_ORIGIN=http://127.0.0.1:3000 RIP_TEST_MATCH_ID=1 RIP_TEST_MISMATCH_ID=2 node --test lib/operations/vision/live.test.mjs`. Export the server’s seller access code in the test shell for a protected server. A cold run makes two paid OpenAI comparisons and checks that concurrent and repeated calls reuse the same provider responses.
 
 Browser QA was performed on an isolated checkout and SQLite backup, using the production server at port 3100. The copy accepted the seeded match solely as a test fixture, then completed collection → inspection → refund → dispatch → delivered and verified persistence after refresh. The original database was not changed by QA.

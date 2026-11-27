@@ -368,14 +368,24 @@ export function useFeed<T>(url: string) {
   }, [refresh]);
   return { data, error, loading, refresh };
 }
-export async function post<T>(url: string, data: unknown): Promise<T> {
+export class OperationError extends Error {
+  constructor(message: string, readonly status: number) {
+    super(message);
+  }
+}
+export async function post<T>(
+  url: string,
+  data: unknown,
+  headers?: Record<string, string>,
+): Promise<T> {
   const response = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...headers },
     body: JSON.stringify(data),
   });
   const result = await response.json();
-  if (!response.ok) throw new Error(result.error ?? "Operation failed.");
+  if (!response.ok)
+    throw new OperationError(result.error ?? "Operation failed.", response.status);
   return result;
 }
 
@@ -383,13 +393,11 @@ export function EvidenceImage({
   url,
   label,
   scan = false,
-  scanRun = 0,
   small = false,
 }: {
   url: string;
   label: string;
   scan?: boolean;
-  scanRun?: number;
   small?: boolean;
 }) {
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
@@ -447,10 +455,10 @@ export function EvidenceImage({
                 <Icon name="expand" size={17} />
               </button>
             )}
-            {scanRun > 0 && (
-              <div key={scanRun} className="rip-scanPreview" aria-hidden="true">
+            {scan && (
+              <div className="rip-scanPreview" aria-hidden="true">
                 <div className={s.scanLine} />
-                <span>DEMO SCAN VISUALISATION</span>
+                <span>COMPARING IMAGES</span>
               </div>
             )}
           </>

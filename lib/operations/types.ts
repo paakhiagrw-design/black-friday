@@ -12,12 +12,15 @@ export interface ReturnView extends ReturnRequest {
 }
 export interface Finding {
   label: string;
+  status: "consistent" | "discrepancy" | "inconclusive";
   detail: string;
   tone: "neutral" | "warning" | "success";
 }
 export interface Assessment {
-  mode: "demo";
-  title: string;
+  model: string;
+  responseId: string;
+  cached: boolean;
+  discrepancies: string[];
   findings: Finding[];
   recommendation: string;
 }
